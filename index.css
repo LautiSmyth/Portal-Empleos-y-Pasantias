@@ -1,0 +1,17 @@
+/* UniJobs Connect custom styles */
+/* This file prevents 404s and allows small global tweaks. */
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Optional: subtle background for app shell; Tailwind handles most styling. */
+:root {
+  color-scheme: light;
+}

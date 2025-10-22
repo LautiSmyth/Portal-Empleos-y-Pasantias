@@ -129,7 +129,13 @@ const App: React.FC = () => {
         data: { role, name },
       },
     });
-    if (error) throw new Error(error.message);
+    if (error) {
+      const msg = error.message || 'Error en registro';
+      if ((error as any)?.status === 429 || /Too Many Requests|rate limit/i.test(msg)) {
+        throw new Error('Demasiadas solicitudes de registro. Espera 60 segundos e intenta otra vez.');
+      }
+      throw new Error(msg);
+    }
 
     // Si la instancia no requiere confirmación por email, habrá sesión y podemos asegurar perfil
     if (data?.user) {

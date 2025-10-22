@@ -133,20 +133,12 @@ const AdminDashboard: React.FC = () => {
         setRecentProfiles(recProfiles ?? []);
 
         // Empresas: intentar incluir 'suspended'; si la columna no existe en el proyecto, caer sin ella
-        const { data: comps, error: compsErr } = await supabase
+        // Empresas: cargar columnas existentes para evitar 400 en proyectos sin 'suspended'
+        const { data: companiesData } = await supabase
           .from('companies')
-          .select('id, name, owner_id, created_at, suspended')
+          .select('id, name, owner_id, created_at')
           .order('created_at', { ascending: false })
           .limit(10);
-        let companiesData = comps ?? [];
-        if (compsErr) {
-          const { data: comps2 } = await supabase
-            .from('companies')
-            .select('id, name, owner_id, created_at')
-            .order('created_at', { ascending: false })
-            .limit(10);
-          companiesData = comps2 ?? [];
-        }
 
         const owners = (companiesData ?? []).map((c: any) => c.owner_id).filter(Boolean);
         let ownersVerified: Record<string, boolean | null> = {};
@@ -162,22 +154,11 @@ const AdminDashboard: React.FC = () => {
           suspended: c.suspended ?? false,
           owner_verified: ownersVerified[c.owner_id] ?? null,
         })));
-
-        // Puestos: intentar incluir 'is_active'; si la columna no existe, caer sin ella y default true
-        const { data: js, error: jobsErr } = await supabase
+        const { data: jobsData } = await supabase
           .from('jobs')
-          .select('id, title, company_id, created_at, is_active')
+          .select('id, title, company_id, created_at')
           .order('created_at', { ascending: false })
           .limit(10);
-        let jobsData = js ?? [];
-        if (jobsErr) {
-          const { data: js2 } = await supabase
-            .from('jobs')
-            .select('id, title, company_id, created_at')
-            .order('created_at', { ascending: false })
-            .limit(10);
-          jobsData = js2 ?? [];
-        }
         setJobs((jobsData ?? []).map((j: any) => ({
           ...j,
           is_active: j.is_active ?? true,
