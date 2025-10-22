@@ -26,5 +26,3 @@ dist-ssr
 # Environment files (do not commit secrets)
 .env
 server/.env
-# Keep examples tracked
-!server/.env.example
