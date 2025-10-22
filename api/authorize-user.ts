@@ -28,7 +28,7 @@ export default async function handler(req: any, res: any) {
       if (!found) return res.status(404).json({ ok: false, error: 'Usuario no encontrado por email' })
       user_id = found.id
     }
-    const { error } = await supabase.auth.admin.updateUserById(user_id, { email_confirmed_at: new Date().toISOString() })
+    const { error } = await supabase.auth.admin.updateUserById(user_id, { email_confirm: true })
     if (error) return res.status(400).json({ ok: false, error: error.message || 'No se pudo autorizar la cuenta' })
     return res.status(200).json({ ok: true })
   } catch (e: any) {

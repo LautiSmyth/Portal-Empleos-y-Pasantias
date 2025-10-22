@@ -165,7 +165,7 @@ fastify.post('/authorize-user', async (req, reply) => {
       if (!found) return reply.code(404).send({ ok: false, error: 'Usuario no encontrado por email' })
       user_id = found.id
     }
-    const { error } = await supabase.auth.admin.updateUserById(user_id, { email_confirmed_at: new Date().toISOString() })
+    const { error } = await supabase.auth.admin.updateUserById(user_id, { email_confirm: true })
     if (error) return reply.code(400).send({ ok: false, error: error.message || 'No se pudo autorizar la cuenta' })
     return reply.send({ ok: true })
   } catch (e) {
