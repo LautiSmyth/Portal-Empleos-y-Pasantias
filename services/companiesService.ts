@@ -25,7 +25,6 @@ export async function fetchCompanies(): Promise<Company[]> {
     .order('name', { ascending: true })
 
   if (error || !data) {
-    console.warn('fetchCompanies: error or empty', error)
     return []
   }
   return (data as DbCompanyRow[]).map(mapRow)
@@ -40,7 +39,6 @@ export async function fetchCompanyById(id: string): Promise<Company | null> {
     .maybeSingle()
 
   if (error || !data) {
-    console.warn('fetchCompanyById: not found', error)
     return null
   }
   return mapRow(data as DbCompanyRow)
@@ -54,7 +52,6 @@ export async function fetchCompaniesByIds(ids: string[]): Promise<Company[]> {
     .in('id', ids)
 
   if (error || !data) {
-    console.warn('fetchCompaniesByIds: error', error)
     return []
   }
   return (data as DbCompanyRow[]).map(mapRow)
@@ -69,7 +66,6 @@ export async function fetchCompanyByOwnerId(ownerId: string): Promise<Company | 
     .maybeSingle()
 
   if (error || !data) {
-    console.warn('fetchCompanyByOwnerId: not found', error)
     return null
   }
   const row = data as DbCompanyRow

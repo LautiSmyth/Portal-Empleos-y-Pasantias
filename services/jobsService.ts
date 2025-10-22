@@ -49,7 +49,6 @@ export async function fetchJobs(): Promise<Job[]> {
     .order('created_at', { ascending: false })
 
   if (error || !data) {
-    console.warn('fetchJobs: falling back due to error', error)
     return []
   }
   return (data as DbJobRow[]).map(mapDbRowToJob)
@@ -64,7 +63,6 @@ export async function fetchJobById(id: string): Promise<Job | null> {
     .maybeSingle()
 
   if (error || !data) {
-    console.warn('fetchJobById: not found or error', error)
     return null
   }
   return mapDbRowToJob(data as DbJobRow)
@@ -78,7 +76,6 @@ export async function fetchJobsByIds(ids: string[]): Promise<Job[]> {
     .in('id', ids)
 
   if (error || !data) {
-    console.warn('fetchJobsByIds: error', error)
     return []
   }
   return (data as DbJobRow[]).map(mapDbRowToJob)
@@ -92,7 +89,6 @@ export async function fetchJobsByCompanyId(companyId: string): Promise<Job[]> {
     .order('created_at', { ascending: false })
 
   if (error || !data) {
-    console.warn('fetchJobsByCompanyId: error', error)
     return []
   }
   return (data as DbJobRow[]).map(mapDbRowToJob)

@@ -27,7 +27,6 @@ export async function fetchCVByOwnerId(ownerId: string): Promise<{ cv: CV | null
     .maybeSingle()
 
   if (error) {
-    console.warn('fetchCVByOwnerId error', error)
     return { cv: null }
   }
   if (!data) return { cv: null }
@@ -79,9 +78,6 @@ export async function saveCV(ownerId: string, cv: CV): Promise<{ ok: boolean; pd
       .eq('owner_id', ownerId)
       .limit(1)
       .maybeSingle()
-    if (selErr) {
-      console.warn('saveCV: select error', selErr)
-    }
 
     if (existing && (existing as any).id) {
       const updatePayload: any = { data: sanitized }

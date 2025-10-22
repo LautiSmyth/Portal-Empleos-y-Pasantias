@@ -25,7 +25,6 @@ export async function fetchApplicationsByStudent(studentId: string): Promise<App
     .order('applied_at', { ascending: false })
 
   if (error || !data) {
-    console.warn('fetchApplicationsByStudent: error or empty', error)
     return []
   }
   return (data as DbApplicationRow[]).map(mapRow)
@@ -39,7 +38,6 @@ export async function fetchApplicationCountsByJobIds(jobIds: string[]): Promise<
     .in('job_id', jobIds)
 
   if (error || !data) {
-    console.warn('fetchApplicationCountsByJobIds: error', error)
     return {}
   }
   const counts: Record<string, number> = {}
@@ -56,8 +54,7 @@ export async function hasAppliedToJob(jobId: string, studentId: string): Promise
     .eq('job_id', jobId)
     .eq('student_id', studentId)
     .limit(1)
-  if (error) {
-    console.warn('hasAppliedToJob error', error)
+  if (error || !data) {
     return false
   }
   return Array.isArray(data) && data.length > 0
