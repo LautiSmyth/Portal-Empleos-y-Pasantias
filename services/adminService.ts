@@ -63,7 +63,7 @@ export async function requestPasswordReset(email: string): Promise<{ ok: boolean
 // Admin: actualizar perfil con Service Role
 // Estrategia: preferir API admin; si no está configurada, intentar RPC 'admin_update_profile';
 // como último recurso (no recomendado), update directo (puede fallar por RLS).
-export async function adminUpdateProfile(payload: { userId: string; firstName?: string | null; university?: string | null; role?: Role }): Promise<{ ok: boolean; error?: string }> {
+export async function adminUpdateProfile(payload: { userId: string; firstName?: string | null; university?: string | null; role?: Role; companyVerified?: boolean | null }): Promise<{ ok: boolean; error?: string }> {
   const adminApiUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
   try {
     if (adminApiUrl) {
@@ -78,6 +78,7 @@ export async function adminUpdateProfile(payload: { userId: string; firstName?: 
           first_name: payload.firstName ?? null,
           university: payload.university ?? null,
           role: payload.role ?? null,
+          company_verified: payload.companyVerified ?? undefined,
         }),
       })
       const json = await res.json().catch(() => ({}))
@@ -91,6 +92,7 @@ export async function adminUpdateProfile(payload: { userId: string; firstName?: 
       first_name: payload.firstName ?? null,
       university: payload.university ?? null,
       role: payload.role ?? null,
+      company_verified: payload.companyVerified ?? null,
     })
     if (rpcErr) return { ok: false, error: rpcErr.message || 'No se pudo actualizar perfil (RPC)' }
     return { ok: true }
@@ -99,7 +101,7 @@ export async function adminUpdateProfile(payload: { userId: string; firstName?: 
     try {
       const { error } = await supabase
         .from('profiles')
-        .update({ first_name: payload.firstName ?? null, university: payload.university ?? null, role: payload.role ?? null })
+        .update({ first_name: payload.firstName ?? null, university: payload.university ?? null, role: payload.role ?? null, company_verified: payload.companyVerified ?? null })
         .eq('id', payload.userId)
       if (error) return { ok: false, error: error.message || 'No se pudo actualizar perfil (RLS)' }
       return { ok: true }

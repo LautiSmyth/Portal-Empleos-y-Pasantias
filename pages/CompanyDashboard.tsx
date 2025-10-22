@@ -10,6 +10,7 @@ import { fetchApplicationCountsByJobIds } from '../services/applicationsService'
 
 const CompanyDashboard: React.FC = () => {
     const auth = useContext(AuthContext);
++   const isVerified = Boolean(auth?.currentUser?.company_verified);
 
     const [jobTitle, setJobTitle] = useState('');
     const [jobKeywords, setJobKeywords] = useState('');
@@ -52,6 +53,11 @@ const CompanyDashboard: React.FC = () => {
                 {/* Create Job Section */}
                 <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm">
                     <h2 className="text-2xl font-bold mb-4">Create New Job Posting</h2>
++                    {!isVerified && (
++                      <div className="mb-4 border border-yellow-200 bg-yellow-50 text-yellow-800 p-3 rounded">
++                        Your company is not verified yet. Posting is disabled until an admin verifies your account.
++                      </div>
++                    )}
                     <div className="space-y-4">
                         <div>
                             <label htmlFor="jobTitle" className="block text-sm font-medium text-gray-700">Job Title</label>
@@ -87,8 +93,16 @@ const CompanyDashboard: React.FC = () => {
                             />
                         </div>
                          <button className="w-full px-4 py-3 text-md font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700">
++                         <button
++                           className="w-full px-4 py-3 text-md font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
++                           disabled={!isVerified}
++                           title={!isVerified ? 'Posting disabled until company verification' : undefined}
++                         >
                             Post Job (Demo)
                         </button>
++                        {!isVerified && (
++                          <p className="text-xs text-gray-500 mt-2">If you believe this is a mistake, please contact support or wait for admin review.</p>
++                        )}
                     </div>
                 </div>
 

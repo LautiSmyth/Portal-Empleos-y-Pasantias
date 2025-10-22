@@ -60,7 +60,11 @@ create policy jobs_insert_company_owner on public.jobs
 for insert with check (
   exists (
     select 1 from public.companies c
-    where c.id = company_id and c.owner_id = auth.uid()
+    join public.profiles p on p.id = c.owner_id
+    where c.id = company_id
+      and c.owner_id = auth.uid()
+      and coalesce(p.company_verified, false) = true
+      and coalesce(c.suspended, false) = false
   )
 );
 
@@ -69,13 +73,21 @@ create policy jobs_update_company_owner on public.jobs
 for update using (
   exists (
     select 1 from public.companies c
-    where c.id = jobs.company_id and c.owner_id = auth.uid()
+    join public.profiles p on p.id = c.owner_id
+    where c.id = jobs.company_id
+      and c.owner_id = auth.uid()
+      and coalesce(p.company_verified, false) = true
+      and coalesce(c.suspended, false) = false
   )
 )
 with check (
   exists (
     select 1 from public.companies c
-    where c.id = jobs.company_id and c.owner_id = auth.uid()
+    join public.profiles p on p.id = c.owner_id
+    where c.id = jobs.company_id
+      and c.owner_id = auth.uid()
+      and coalesce(p.company_verified, false) = true
+      and coalesce(c.suspended, false) = false
   )
 );
 

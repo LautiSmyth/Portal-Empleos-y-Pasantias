@@ -25,6 +25,12 @@ export interface Company {
   logoUrl: string;
   website: string;
   description: string;
+  // Nuevos campos de registro empresarial
+  email?: string;
+  legalName?: string;
+  industry?: string;
+  hrContactName?: string;
+  contactPhone?: string;
 }
 
 export interface Job {

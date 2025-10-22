@@ -113,10 +113,36 @@ declare
   meta_role text := coalesce(nullif(new.raw_user_meta_data->>'role',''), 'STUDENT');
   valid_role text := case when meta_role in ('STUDENT','COMPANY','ADMIN') then meta_role else 'STUDENT' end;
   meta_first text := nullif(new.raw_user_meta_data->>'name','');
+
+  -- Metadatos de empresa para inserción automática
+  meta_company_name text := nullif(new.raw_user_meta_data->>'company_name','');
+  meta_company_email text := nullif(new.raw_user_meta_data->>'company_email','');
+  meta_company_legal text := nullif(new.raw_user_meta_data->>'company_legal_name','');
+  meta_company_industry text := nullif(new.raw_user_meta_data->>'company_industry','');
+  meta_company_hr text := nullif(new.raw_user_meta_data->>'company_hr_contact','');
+  meta_company_logo text := nullif(new.raw_user_meta_data->>'company_logo_url','');
+  meta_company_phone text := nullif(new.raw_user_meta_data->>'company_phone','');
 begin
   insert into public.profiles (id, role, first_name)
   values (new.id, valid_role, meta_first)
   on conflict (id) do nothing;
+
+  if valid_role = 'COMPANY' then
+    insert into public.companies (name, logo_url, website, description, owner_id, email, legal_name, industry, hr_contact_name, contact_phone)
+    values (
+      coalesce(meta_company_name, meta_first, 'Empresa'),
+      meta_company_logo,
+      null,
+      null,
+      new.id,
+      coalesce(meta_company_email, new.email),
+      coalesce(meta_company_legal, ''),
+      coalesce(meta_company_industry, ''),
+      coalesce(meta_company_hr, ''),
+      coalesce(meta_company_phone, '')
+    );
+  end if;
+
   return new;
 end;$$;
 
@@ -125,9 +151,15 @@ create trigger on_auth_user_created
 after insert on auth.users
 for each row execute function public.handle_new_user();
 
--- Moderación: columnas para ocultar/suspender
+-- Moderación y datos de empresa: columnas adicionales
 alter table public.jobs add column if not exists is_active boolean not null default true;
 alter table public.companies add column if not exists suspended boolean not null default false;
+-- Campos requeridos para registro de empresa
+alter table public.companies add column if not exists email text not null default '';
+alter table public.companies add column if not exists legal_name text not null default '';
+alter table public.companies add column if not exists industry text not null default '';
+alter table public.companies add column if not exists hr_contact_name text not null default '';
+alter table public.companies add column if not exists contact_phone text not null default '';
 
 -- Auditoría: tabla de logs de administración
 create table if not exists public.admin_logs (
@@ -213,7 +245,7 @@ before update on public.profiles
 for each row execute function public.enforce_admin_profile_guards();
 
 -- RPC: actualizar perfil con log
-create or replace function public.admin_update_profile(user_id uuid, first_name text, university text, role text)
+create or replace function public.admin_update_profile(user_id uuid, first_name text, university text, role text, company_verify boolean default null)
 returns void
 language plpgsql security definer set search_path = public as $$
 begin
@@ -223,9 +255,10 @@ begin
   update public.profiles p
   set first_name = coalesce(first_name, p.first_name),
       university = coalesce(university, p.university),
-      role = coalesce(role, p.role)
+      role = coalesce(role, p.role),
+      company_verified = coalesce(company_verify, p.company_verified)
   where id = user_id;
   if not found then raise exception 'profile not found'; end if;
   insert into public.admin_logs(actor_id, action, entity, entity_id, details)
-  values (auth.uid(), 'update_profile', 'profiles', user_id, jsonb_build_object('first_name', first_name, 'university', university, 'role', role));
+  values (auth.uid(), 'update_profile', 'profiles', user_id, jsonb_build_object('first_name', first_name, 'university', university, 'role', role, 'company_verify', company_verify));
 end; $$;

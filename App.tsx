@@ -28,9 +28,17 @@ export type AuthUser = {
 
 type StoredUser = AuthUser & { password?: string };
 
+type CompanyMeta = {
+  legal_name?: string;
+  industry?: string;
+  hr_contact_name?: string;
+  logo_url?: string;
+  phone?: string;
+};
+
 type AuthContextType = {
   currentUser: AuthUser | null;
-  register: (email: string, password: string, role: Role, name?: string) => Promise<void>;
+  register: (email: string, password: string, role: Role, name?: string, company?: CompanyMeta) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
   verifyEmail: () => Promise<void>;
@@ -117,20 +125,59 @@ const App: React.FC = () => {
   }, [currentUser, location.pathname, navigate]);
 
   // Registro con Supabase Auth
-  const register = async (email: string, password: string, role: Role, name?: string) => {
+  const register = async (email: string, password: string, role: Role, name?: string, company?: CompanyMeta) => {
     // Guarda email para reenvío en VerifyEmail si no hay sesión aún
     try { localStorage.setItem('pending_verification_email', email); } catch {}
 
+    const isCompany = role === Role.COMPANY;
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/#/auth/verify-email`,
-        data: { role, name },
+        data: {
+          role,
+          name,
+          ...(isCompany ? {
+            company_name: name,
+            company_email: email,
+            company_legal_name: company?.legal_name,
+            company_industry: company?.industry,
+            company_hr_contact: company?.hr_contact_name,
+            company_logo_url: company?.logo_url,
+            company_phone: company?.phone,
+          } : {}),
+        },
       },
     });
     if (error) {
       const msg = error.message || 'Error en registro';
+      // Fallback: si falla el envío de email de confirmación, generamos y enviamos link vía API
+      if (/send(ing)? confirmation email|confirm(ación)? por email|SMTP|500/i.test(msg)) {
+        const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || '';
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        if (token) headers['X-Admin-Token'] = token;
+        try {
+          const res = await fetch('/api/send-auth-link', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ email, type: 'signup', redirectTo: `${window.location.origin}/#/auth/verify-email` }),
+          });
+          const json = await res.json().catch(() => ({}));
+          if (res.ok) {
+            // Continuar al paso de verificación aunque Supabase no haya enviado el email
+            navigate('/auth/verify-email');
+            return;
+          }
+          throw new Error(json?.error || msg);
+        } catch (fallbackErr: any) {
+          const fmsg = fallbackErr?.message || msg;
+          if ((error as any)?.status === 429 || /Too Many Requests|rate limit/i.test(fmsg)) {
+            throw new Error('Demasiadas solicitudes de registro. Espera 60 segundos e intenta otra vez.');
+          }
+          throw new Error(fmsg);
+        }
+      }
       if ((error as any)?.status === 429 || /Too Many Requests|rate limit/i.test(msg)) {
         throw new Error('Demasiadas solicitudes de registro. Espera 60 segundos e intenta otra vez.');
       }
@@ -142,6 +189,9 @@ const App: React.FC = () => {
       await supabase.from('profiles').upsert({ id: data.user.id, role, first_name: name });
       await refreshCurrentUserFromSupabase();
     }
+
+    // Navegar a verificación en cualquier caso; si no hay sesión, se quedará esperando confirmación
+    navigate('/auth/verify-email');
   };
 
   // Login con email/password en Supabase
@@ -169,12 +219,26 @@ const App: React.FC = () => {
   const resendVerificationEmail = async () => {
     const email = currentUser?.email || localStorage.getItem('pending_verification_email') || '';
     if (!email) throw new Error('No hay email pendiente para verificación');
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/#/auth/verify-email` },
-    } as any);
-    if (error) throw new Error(error.message);
+    // Intentar con Supabase; si falla el envío, usar fallback por API
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/#/auth/verify-email` },
+      } as any);
+      if (error) throw new Error(error.message);
+    } catch (err: any) {
+      const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || '';
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers['X-Admin-Token'] = token;
+      const res = await fetch('/api/send-auth-link', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ email, type: 'signup', redirectTo: `${window.location.origin}/#/auth/verify-email` }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(json?.error || err?.message || 'No se pudo enviar email de verificación');
+    }
   };
 
   // Logout

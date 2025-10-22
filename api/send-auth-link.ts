@@ -40,14 +40,16 @@ export default async function handler(req: any, res: any) {
     const resend = getResend()
     const mailSubject = subject || (type === 'recovery' ? 'Recupera tu contraseña' : type === 'signup' ? 'Verifica tu correo' : 'Accede a tu cuenta')
     const html = `<h1>${mailSubject}</h1><p>Haz clic <a href="${actionLink}">aquí</a> para continuar.</p>`
+    const fromAddress = from || process.env.RESEND_FROM || 'onboarding@resend.dev'
     const result = await resend.emails.send({
-      from: from || process.env.RESEND_FROM || 'no-reply@resend.dev',
+      from: fromAddress,
       to: [email],
       subject: mailSubject,
       html,
     })
     if ((result as any)?.error) {
-      return res.status(400).json({ ok: false, error: (result as any).error?.message || 'Fallo enviando email' })
+      const errMsg = (result as any).error?.message || 'Fallo enviando email'
+      return res.status(400).json({ ok: false, error: errMsg })
     }
     return res.status(200).json({ ok: true, action_link: actionLink, data: result?.data })
   } catch (e: any) {

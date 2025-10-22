@@ -23,7 +23,7 @@ export default async function handler(req: any, res: any) {
   try {
     const resend = getResend()
     const result = await resend.emails.send({
-      from: from || process.env.RESEND_FROM || 'no-reply@resend.dev',
+      from: from || process.env.RESEND_FROM || 'onboarding@resend.dev',
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
