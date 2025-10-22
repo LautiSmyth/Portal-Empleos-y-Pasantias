@@ -26,3 +26,4 @@ dist-ssr
 # Environment files (do not commit secrets)
 .env*
 server/.env*
+.env.local*
