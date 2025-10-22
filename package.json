@@ -12,6 +12,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.76.1",
     "@vercel/speed-insights": "^1.2.0",
+    "docx": "^9.5.1",
+    "jspdf": "^3.0.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.9.4",

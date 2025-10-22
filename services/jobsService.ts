@@ -93,3 +93,57 @@ export async function fetchJobsByCompanyId(companyId: string): Promise<Job[]> {
   }
   return (data as DbJobRow[]).map(mapDbRowToJob)
 }
+
+export async function createJobViaAdminApi(payload: { title: string; description: string; area: string; location: string; experienceMin: number; salaryMin?: number | null; salaryMax?: number | null; modality: string; companyId: string; isActive?: boolean }): Promise<{ ok: boolean; id?: string; error?: string }> {
+  const envUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
+  const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (token) headers['X-Admin-Token'] = token
+  const url = envUrl ? `${envUrl}/create-job` : `/api/create-job`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      title: payload.title,
+      description: payload.description,
+      area: payload.area,
+      location: payload.location,
+      experience_min: payload.experienceMin,
+      salary_min: payload.salaryMin ?? null,
+      salary_max: payload.salaryMax ?? null,
+      modality: payload.modality,
+      company_id: payload.companyId,
+      is_active: payload.isActive,
+    }),
+  })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) return { ok: false, error: json?.error || 'No se pudo crear el puesto' }
+  return { ok: true, id: json?.id }
+}
+
+export async function updateJobViaAdminApi(payload: { jobId: string; title?: string; description?: string; area?: string; location?: string; experienceMin?: number; salaryMin?: number | null; salaryMax?: number | null; modality?: string; isActive?: boolean }): Promise<{ ok: boolean; error?: string }> {
+  const envUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
+  const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+  if (token) headers['X-Admin-Token'] = token
+  const url = envUrl ? `${envUrl}/update-job` : `/api/update-job`
+  const res = await fetch(url, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      job_id: payload.jobId,
+      title: payload.title,
+      description: payload.description,
+      area: payload.area,
+      location: payload.location,
+      experience_min: payload.experienceMin,
+      salary_min: payload.salaryMin,
+      salary_max: payload.salaryMax,
+      modality: payload.modality,
+      is_active: payload.isActive,
+    }),
+  })
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok) return { ok: false, error: json?.error || 'No se pudo actualizar el puesto' }
+  return { ok: true }
+}

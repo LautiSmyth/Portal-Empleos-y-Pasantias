@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../App';
 import { Role, ApplicationStatus } from '../types';
 import { updateApplicationStatus, toggleJobActive, toggleCompanySuspended, createUserViaAdminApi, requestPasswordReset, adminUpdateProfile, logAdminAction, searchProfiles, authorizeUserAccount } from '../services/adminService';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Link } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 
 function UserCreateForm() {
@@ -325,6 +325,14 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Panel de Administración</h1>
++     <div className="flex items-center gap-3">
++       <Link to="/dashboard/admin/jobs" className="px-3 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300">
++         Gestionar puestos
++       </Link>
++       <Link to="/dashboard/admin/cv" className="px-3 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300">
++         CV del Admin
++       </Link>
++     </div>
       {error && <div className="p-3 rounded bg-red-50 text-red-700">{error}</div>}
       {loading && <div className="text-gray-600">Cargando...</div>}
 
