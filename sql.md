@@ -1,6 +1,17 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
+CREATE TABLE public.admin_logs (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  actor_id uuid,
+  action text NOT NULL,
+  entity text NOT NULL,
+  entity_id uuid,
+  details jsonb DEFAULT '{}'::jsonb,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT admin_logs_pkey PRIMARY KEY (id),
+  CONSTRAINT admin_logs_actor_id_fkey FOREIGN KEY (actor_id) REFERENCES public.profiles(id)
+);
 CREATE TABLE public.applications (
   id uuid NOT NULL DEFAULT gen_random_uuid(),
   job_id uuid NOT NULL,
@@ -21,6 +32,12 @@ CREATE TABLE public.companies (
   owner_id uuid,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  suspended boolean NOT NULL DEFAULT false,
+  email text NOT NULL DEFAULT ''::text,
+  legal_name text NOT NULL DEFAULT ''::text,
+  industry text NOT NULL DEFAULT ''::text,
+  hr_contact_name text NOT NULL DEFAULT ''::text,
+  contact_phone text NOT NULL DEFAULT ''::text,
   CONSTRAINT companies_pkey PRIMARY KEY (id),
   CONSTRAINT companies_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES public.profiles(id)
 );
@@ -48,6 +65,7 @@ CREATE TABLE public.jobs (
   views integer NOT NULL DEFAULT 0,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  is_active boolean NOT NULL DEFAULT true,
   CONSTRAINT jobs_pkey PRIMARY KEY (id),
   CONSTRAINT jobs_company_id_fkey FOREIGN KEY (company_id) REFERENCES public.companies(id)
 );

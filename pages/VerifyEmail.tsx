@@ -37,6 +37,7 @@ const VerifyEmail: React.FC = () => {
     }
     if (user.role === Role.STUDENT) return navigate('/dashboard/student');
     if (user.role === Role.COMPANY) return navigate('/dashboard/company');
+    if (user.role === Role.ADMIN) return navigate('/dashboard/admin');
     navigate('/');
   };
 

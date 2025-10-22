@@ -7,6 +7,7 @@ import { Role } from '../types';
 const Header: React.FC = () => {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
+  const isDev = (import.meta as any).env?.DEV ?? false;
 
   const handleLogout = () => {
     auth?.logout();
@@ -64,6 +65,13 @@ const Header: React.FC = () => {
             )}
           </nav>
           <div className="flex items-center space-x-4">
+            {isDev && (
+              <div className="hidden sm:flex items-center space-x-2 mr-2">
+                <button onClick={() => auth?.loginAs('dev-student', Role.STUDENT)} className="text-xs px-2 py-1 border rounded text-gray-600 hover:bg-gray-50">Simular Alumno</button>
+                <button onClick={() => auth?.loginAs('dev-company', Role.COMPANY)} className="text-xs px-2 py-1 border rounded text-gray-600 hover:bg-gray-50">Simular Empresa</button>
+                <button onClick={() => auth?.loginAs('dev-admin', Role.ADMIN)} className="text-xs px-2 py-1 border rounded text-gray-600 hover:bg-gray-50">Simular Admin</button>
+              </div>
+            )}
             {auth?.currentUser ? (
               <button
                 onClick={handleLogout}

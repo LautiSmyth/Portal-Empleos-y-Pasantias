@@ -87,13 +87,20 @@ const App: React.FC = () => {
       .eq('id', user.id)
       .maybeSingle();
 
-    const role = (profileData?.role as Role) ?? Role.STUDENT;
+    // Derivar rol con fallback a metadata del usuario si el perfil falta o no tiene rol
+    const metaRole = (user.user_metadata as any)?.role as string | undefined;
+    const normalizeRole = (r?: string): Role => {
+      if (r === Role.ADMIN) return Role.ADMIN;
+      if (r === Role.COMPANY) return Role.COMPANY;
+      return Role.STUDENT;
+    };
+    const role = normalizeRole((profileData?.role as string | undefined) ?? metaRole);
 
     setCurrentUser({
       id: user.id,
       role,
       email: user.email || '',
-      name: profileData?.first_name || undefined,
+      name: profileData?.first_name || (user.user_metadata as any)?.name || undefined,
       emailVerified: !!user.email_confirmed_at,
       companyVerified: profileData?.company_verified ?? undefined,
     });
