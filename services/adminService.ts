@@ -149,15 +149,17 @@ export async function searchProfiles(criteria: { email?: string; role?: Role | '
   // Usar API admin si está configurada (con o sin filtro de email)
   if (adminApiUrl) {
     try {
-      const url = new URL(`${adminApiUrl}/search-users`)
-      if (email) url.searchParams.set('email', email)
-      url.searchParams.set('limit', String(limit))
-      if (criteria.role && criteria.role !== 'ALL') url.searchParams.set('role', String(criteria.role))
-      if (criteria.universityLike) url.searchParams.set('university', criteria.universityLike)
+      const base = (adminApiUrl || '').replace(/\/$/, '')
+      const params = new URLSearchParams()
+      if (email) params.set('email', email)
+      params.set('limit', String(limit))
+      if (criteria.role && criteria.role !== 'ALL') params.set('role', String(criteria.role))
+      if (criteria.universityLike) params.set('university', criteria.universityLike)
+      const urlStr = `${base}/search-users?${params.toString()}`
       const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
       const headers: Record<string, string> = {}
       if (token) headers['X-Admin-Token'] = token
-      const res = await fetch(url.toString(), { headers })
+      const res = await fetch(urlStr, { headers })
       const json = await res.json().catch(() => ({}))
       if (res.ok && Array.isArray(json?.results)) {
         return json.results as Array<{ id: string; first_name: string | null; role: Role; university: string | null; company_verified: boolean | null; created_at: string; email?: string; email_verified?: boolean }>
