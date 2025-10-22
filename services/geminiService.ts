@@ -5,8 +5,6 @@ if (!process.env.API_KEY) {
   console.warn("API_KEY environment variable not set. Gemini API calls will fail.");
 }
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
-
 export const generateJobDescription = async (
   title: string,
   keywords: string
@@ -14,6 +12,8 @@ export const generateJobDescription = async (
   if (!process.env.API_KEY) {
     return Promise.resolve("API Key not configured. Please set the API_KEY environment variable. This is a placeholder description based on your input. It should be detailed and engaging to attract top talent.");
   }
+
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
   const prompt = `
     You are an expert HR copywriter for a university job board. Your audience is talented students and recent graduates.
