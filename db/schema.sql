@@ -131,12 +131,12 @@ alter table public.companies add column if not exists suspended boolean not null
 
 -- Auditoría: tabla de logs de administración
 create table if not exists public.admin_logs (
-  id bigserial primary key,
-  actor_id uuid not null references public.profiles(id) on delete set null,
+  id uuid primary key default gen_random_uuid(),
+  actor_id uuid references public.profiles(id) on delete set null,
   action text not null,
   entity text not null,
   entity_id uuid,
-  details jsonb,
+  details jsonb default '{}'::jsonb,
   created_at timestamptz not null default now()
 );
 create index if not exists admin_logs_actor_idx on public.admin_logs(actor_id);
@@ -186,4 +186,46 @@ begin
   update public.companies set suspended = suspended where id = company_id;
   insert into public.admin_logs(actor_id, action, entity, entity_id, details)
   values (auth.uid(), 'toggle_suspended', 'companies', company_id, jsonb_build_object('suspended', suspended));
+end; $$;
+
+-- SECURITY TRIGGER: evitar cambios de campos privilegiados en profiles por no-admin
+create or replace function public.enforce_admin_profile_guards()
+returns trigger
+language plpgsql security definer set search_path = public as $$
+begin
+  -- Permitir cambios hechos por Service Role (auth.uid() = null)
+  if auth.uid() is null then
+    return new;
+  end if;
+  -- Bloquear cambios de 'role' o 'company_verified' si no es ADMIN
+  if (new.role is distinct from old.role)
+     or (coalesce(new.company_verified,false) is distinct from coalesce(old.company_verified,false)) then
+    if not exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'ADMIN') then
+      raise exception 'not authorized to change privileged profile fields';
+    end if;
+  end if;
+  return new;
+end; $$;
+
+drop trigger if exists guard_profile_admin_fields on public.profiles;
+create trigger guard_profile_admin_fields
+before update on public.profiles
+for each row execute function public.enforce_admin_profile_guards();
+
+-- RPC: actualizar perfil con log
+create or replace function public.admin_update_profile(user_id uuid, first_name text, university text, role text)
+returns void
+language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'ADMIN') then
+    raise exception 'not authorized';
+  end if;
+  update public.profiles p
+  set first_name = coalesce(first_name, p.first_name),
+      university = coalesce(university, p.university),
+      role = coalesce(role, p.role)
+  where id = user_id;
+  if not found then raise exception 'profile not found'; end if;
+  insert into public.admin_logs(actor_id, action, entity, entity_id, details)
+  values (auth.uid(), 'update_profile', 'profiles', user_id, jsonb_build_object('first_name', first_name, 'university', university, 'role', role));
 end; $$;

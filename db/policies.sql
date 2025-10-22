@@ -79,6 +79,13 @@ with check (
   )
 );
 
+-- Allow ADMIN to update any job (e.g., toggle is_active)
+create policy jobs_update_admin on public.jobs
+for update using (
+  exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'ADMIN')
+)
+with check (true);
+
 create policy jobs_delete_company_owner on public.jobs
 for delete using (
   exists (
@@ -139,7 +146,7 @@ using (
 );
 
 create policy profiles_update_admin on public.profiles
-for update to authenticated
+for update
 using (
   exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'ADMIN')
 )
@@ -164,11 +171,9 @@ using (
 );
 
 create policy apps_update_admin on public.applications
-for update to authenticated
+for update
 using (
-  exists (
-    select 1 from public.profiles p where p.id = auth.uid() and p.role = 'ADMIN'
-  )
+  exists (select 1 from public.profiles p where p.id = auth.uid() and p.role = 'ADMIN')
 )
 with check (true);
 
