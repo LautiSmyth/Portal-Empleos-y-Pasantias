@@ -1,0 +1,64 @@
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Job, Company } from '../types';
+import LocationIcon from './icons/LocationIcon';
+import BriefcaseIcon from './icons/BriefcaseIcon';
+import BuildingIcon from './icons/BuildingIcon';
+
+interface JobCardProps {
+  job: Job;
+  company?: Company;
+}
+
+const JobCard: React.FC<JobCardProps> = ({ job, company }) => {
+  const timeSince = (date: Date) => {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+    let interval = seconds / 31536000;
+    if (interval > 1) return Math.floor(interval) + " years ago";
+    interval = seconds / 2592000;
+    if (interval > 1) return Math.floor(interval) + " months ago";
+    interval = seconds / 86400;
+    if (interval > 1) return Math.floor(interval) + " days ago";
+    interval = seconds / 3600;
+    if (interval > 1) return Math.floor(interval) + " hours ago";
+    interval = seconds / 60;
+    if (interval > 1) return Math.floor(interval) + " minutes ago";
+    return "Just now";
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col">
+      <div className="flex items-start space-x-4">
+        {company && <img src={company.logoUrl} alt={`${company.name} logo`} className="w-16 h-16 rounded-md object-cover"/>}
+        <div className="flex-1">
+          <p className="text-sm text-gray-500 flex items-center">
+            <BuildingIcon className="w-4 h-4 mr-1.5" />
+            {company?.name || '...'}
+          </p>
+          <h3 className="text-xl font-bold text-gray-800 mt-1">{job.title}</h3>
+        </div>
+      </div>
+      <div className="mt-4 space-y-2 text-sm text-gray-600">
+        <p className="flex items-center"><LocationIcon className="w-4 h-4 mr-2" /> {job.location} ({job.modality})</p>
+        <p className="flex items-center"><BriefcaseIcon className="w-4 h-4 mr-2" /> {job.experienceMin}+ years of experience</p>
+        {job.salaryRange && (
+          <p className="font-semibold text-green-600">
+            ${job.salaryRange[0].toLocaleString()} - ${job.salaryRange[1].toLocaleString()}
+          </p>
+        )}
+      </div>
+      <div className="mt-6 flex justify-between items-center pt-4 border-t border-gray-100">
+        <p className="text-xs text-gray-400">{timeSince(job.createdAt)}</p>
+        <Link 
+          to={`/jobs/${job.id}`} 
+          className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          View Details
+        </Link>
+      </div>
+    </div>
+  );
+};
+
+export default JobCard;
