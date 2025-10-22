@@ -37,10 +37,14 @@ View your app in AI Studio: https://ai.studio/apps/drive/1C9OuNpXVW4cCiwgIDVT88G
   - `GET /api/search-users`
   - `POST /api/log`
   - `POST /api/authorize-user`
+  - `POST /api/send-email` (Resend)
+  - `POST /api/send-auth-link` (genera link de Supabase y envía con Resend)
 - Variables de entorno (Backend en Vercel):
   - `SUPABASE_URL`
   - `SUPABASE_SERVICE_ROLE_KEY`
   - `ADMIN_API_TOKEN`
+  - `RESEND_API_KEY`
+  - Opcional: `RESEND_FROM` (por defecto `no-reply@resend.dev`)
 - Seguridad: la `SERVICE_ROLE_KEY` va solo en backend; nunca en el frontend.
 
 ## Desarrollo local

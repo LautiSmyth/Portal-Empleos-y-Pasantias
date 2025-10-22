@@ -139,16 +139,16 @@ export async function logAdminAction(params: { actorId: string; action: string; 
 }
 
 // Búsqueda de perfiles; si hay email, usar API admin (auth.users); si no, filtrar por rol/universidad en profiles
-export async function searchProfiles(criteria: { email?: string; role?: Role | 'ALL'; universityLike?: string; limit?: number }): Promise<Array<{ id: string; first_name: string | null; role: Role; university: string | null; company_verified: boolean | null; created_at: string; email?: string }>> {
+export async function searchProfiles(criteria: { email?: string; role?: Role | 'ALL'; universityLike?: string; limit?: number }): Promise<Array<{ id: string; first_name: string | null; role: Role; university: string | null; company_verified: boolean | null; created_at: string; email?: string; email_verified?: boolean }>> {
   const limit = criteria.limit ?? 20
   const email = (criteria.email || '').trim()
   const adminApiUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
 
-  // Buscar por email vía API admin
-  if (email && adminApiUrl) {
+  // Usar API admin si está configurada (con o sin filtro de email)
+  if (adminApiUrl) {
     try {
       const url = new URL(`${adminApiUrl}/search-users`)
-      url.searchParams.set('email', email)
+      if (email) url.searchParams.set('email', email)
       url.searchParams.set('limit', String(limit))
       if (criteria.role && criteria.role !== 'ALL') url.searchParams.set('role', String(criteria.role))
       if (criteria.universityLike) url.searchParams.set('university', criteria.universityLike)
@@ -158,12 +158,12 @@ export async function searchProfiles(criteria: { email?: string; role?: Role | '
       const res = await fetch(url.toString(), { headers })
       const json = await res.json().catch(() => ({}))
       if (res.ok && Array.isArray(json?.results)) {
-        return json.results as Array<{ id: string; first_name: string | null; role: Role; university: string | null; company_verified: boolean | null; created_at: string; email?: string }>
+        return json.results as Array<{ id: string; first_name: string | null; role: Role; university: string | null; company_verified: boolean | null; created_at: string; email?: string; email_verified?: boolean }>
       }
     } catch (_) {}
   }
 
-  // Fallback a consulta directa por rol/universidad
+  // Fallback a consulta directa por rol/universidad (sin email_verified)
   let q = supabase
     .from('profiles')
     .select('id, first_name, role, university, company_verified, created_at')

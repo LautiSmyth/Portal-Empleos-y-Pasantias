@@ -123,6 +123,7 @@ fastify.get('/search-users', async (req, reply) => {
     const results = filtered.slice(0, limit).map(u => ({
       id: u.id,
       email: u.email,
+      email_verified: Boolean(u.email_confirmed_at),
       first_name: byId.get(u.id)?.first_name || null,
       role: byId.get(u.id)?.role || 'STUDENT',
       university: byId.get(u.id)?.university || null,

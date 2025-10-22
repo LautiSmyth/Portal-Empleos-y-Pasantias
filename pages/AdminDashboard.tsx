@@ -73,6 +73,8 @@ type DbProfile = {
   university: string | null;
   company_verified: boolean | null;
   created_at: string;
+  email?: string;
+  email_verified?: boolean;
 };
 
 type DbCompany = {
@@ -269,6 +271,14 @@ const AdminDashboard: React.FC = () => {
         entityId: userId,
         details: { via: 'admin_api' },
       });
+      // Refrescar lista para reflejar estado de verificación de email
+      const refreshed = await searchProfiles({
+        email: filterEmail || undefined,
+        role: filterRole,
+        universityLike: filterUniversity || undefined,
+        limit: 20,
+      });
+      setRecentProfiles(refreshed || []);
     } catch (e: any) {
       setError(e?.message || 'Error al autorizar la cuenta');
     } finally {
@@ -384,10 +394,14 @@ const AdminDashboard: React.FC = () => {
                 <div>
                   <p className="font-medium">{p.first_name || '(sin nombre)'} <span className="ml-2 text-sm text-gray-500">{p.id.slice(0, 8)}</span></p>
                   <p className="text-sm text-gray-600">Rol: {p.role} • Univ: {p.university || '—'}</p>
+                  <p className="text-sm text-gray-600">Email: {p.email || '—'}</p>
                 </div>
                 <div className="flex items-center space-x-2">
                   <span className={`px-2 py-1 text-xs rounded ${p.company_verified ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                     Empresa verificada: {p.company_verified ? 'Sí' : 'No'}
+                  </span>
+                  <span className={`px-2 py-1 text-xs rounded ${p.email_verified ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                    Email verificado: {p.email_verified ? 'Sí' : 'No'}
                   </span>
                   <button
                     className="px-3 py-1 text-sm rounded bg-gray-200 hover:bg-gray-300"
@@ -398,7 +412,7 @@ const AdminDashboard: React.FC = () => {
                   <button
                     className="px-3 py-1 text-sm rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
                     onClick={() => handleAuthorizeUser(p.id)}
-                    disabled={authorizingUserId === p.id}
+                    disabled={authorizingUserId === p.id || p.email_verified === true}
                   >
                     Autorizar
                   </button>
