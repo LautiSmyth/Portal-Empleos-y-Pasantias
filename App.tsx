@@ -18,6 +18,7 @@ import { supabase } from './services/supabaseClient';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import AdminCV from './pages/AdminCV';
 import AdminJobs from './pages/AdminJobs';
+import DesignSystem from './pages/DesignSystem';
 
 export type AuthUser = {
   id: string;
@@ -284,6 +285,7 @@ const App: React.FC = () => {
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
+            <Route path="/design-system" element={<DesignSystem />} />
           </Routes>
         </main>
         <Footer />
