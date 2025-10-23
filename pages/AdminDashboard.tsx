@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../App';
 import { Role, ApplicationStatus } from '../types';
-import { updateApplicationStatus, toggleJobActive, toggleCompanySuspended, createUserViaAdminApi, requestPasswordReset, adminUpdateProfile, logAdminAction, searchProfiles, authorizeUserAccount } from '../services/adminService';
+import { updateApplicationStatus, toggleJobActive, toggleCompanySuspended, createUserViaAdminApi, requestPasswordReset, adminUpdateProfile, logAdminAction, searchProfiles, authorizeUserAccount, deleteUserViaAdminApi } from '../services/adminService';
 import { Navigate, Link } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
 
@@ -107,6 +107,7 @@ const AdminDashboard: React.FC = () => {
   const [savingProfile, setSavingProfile] = useState(false);
   const [authorizingUserId, setAuthorizingUserId] = useState<string | null>(null);
   const [verifyingCompanyUserId, setVerifyingCompanyUserId] = useState<string | null>(null);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
 
   // Filtros de usuarios
   const [filterRole, setFilterRole] = useState<Role | 'ALL'>('ALL');
@@ -261,26 +262,15 @@ const AdminDashboard: React.FC = () => {
   const handleAuthorizeUser = async (userId: string) => {
     if (!auth?.currentUser) return;
     setAuthorizingUserId(userId);
+    setError(null);
     try {
       const res = await authorizeUserAccount({ userId });
-      if (!res.ok) throw new Error(res.error || 'No se pudo autorizar la cuenta');
-      await logAdminAction({
-        actorId: auth.currentUser.id,
-        action: 'authorize_user',
-        entity: 'auth.users',
-        entityId: userId,
-        details: { via: 'admin_api' },
-      });
-      // Refrescar lista para reflejar estado de verificación de email
-      const refreshed = await searchProfiles({
-        email: filterEmail || undefined,
-        role: filterRole,
-        universityLike: filterUniversity || undefined,
-        limit: 20,
-      });
+      if (!res.ok) throw new Error(res.error || 'No se pudo autorizar cuenta');
+      await logAdminAction({ actorId: auth.currentUser.id, action: 'authorize_user', entity: 'auth.users', entityId: userId });
+      const refreshed = await searchProfiles({ limit: 10 });
       setRecentProfiles(refreshed || []);
     } catch (e: any) {
-      setError(e?.message || 'Error al autorizar la cuenta');
+      setError(e?.message || 'Error autorizando cuenta');
     } finally {
       setAuthorizingUserId(null);
     }
@@ -289,27 +279,35 @@ const AdminDashboard: React.FC = () => {
   const handleVerifyCompany = async (userId: string) => {
     if (!auth?.currentUser) return;
     setVerifyingCompanyUserId(userId);
+    setError(null);
     try {
       const res = await adminUpdateProfile({ userId, companyVerified: true });
-      if (!res.ok) throw new Error(res.error || 'No se pudo verificar la empresa');
-      await logAdminAction({
-        actorId: auth.currentUser.id,
-        action: 'verify_company',
-        entity: 'profiles',
-        entityId: userId,
-        details: { via: 'admin_api' },
-      });
-      const refreshed = await searchProfiles({
-        email: filterEmail || undefined,
-        role: filterRole,
-        universityLike: filterUniversity || undefined,
-        limit: 20,
-      });
+      if (!res.ok) throw new Error(res.error || 'No se pudo verificar empresa');
+      await logAdminAction({ actorId: auth.currentUser.id, action: 'verify_company', entity: 'profiles', entityId: userId });
+      const refreshed = await searchProfiles({ limit: 10 });
       setRecentProfiles(refreshed || []);
     } catch (e: any) {
-      setError(e?.message || 'Error al verificar empresa');
+      setError(e?.message || 'Error verificando empresa');
     } finally {
       setVerifyingCompanyUserId(null);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!auth?.currentUser) return;
+    if (!window.confirm('¿Eliminar usuario y su perfil? Esta acción es irreversible.')) return;
+    setDeletingUserId(userId);
+    setError(null);
+    try {
+      const res = await deleteUserViaAdminApi({ userId });
+      if (!res.ok) throw new Error(res.error || 'No se pudo eliminar usuario');
+      await logAdminAction({ actorId: auth.currentUser.id, action: 'delete_user', entity: 'auth.users', entityId: userId });
+      const refreshed = await searchProfiles({ limit: 10 });
+      setRecentProfiles(refreshed || []);
+    } catch (e: any) {
+      setError(e?.message || 'Error eliminando usuario');
+    } finally {
+      setDeletingUserId(null);
     }
   };
 
@@ -461,6 +459,13 @@ const AdminDashboard: React.FC = () => {
                       Verificar empresa
                     </button>
                   )}
+                  <button
+                    className="px-3 py-1 text-sm rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50"
+                    onClick={() => handleDeleteUser(p.id)}
+                    disabled={deletingUserId === p.id}
+                  >
+                    Eliminar
+                  </button>
                 </div>
               </div>
               {editingProfileId === p.id && (
