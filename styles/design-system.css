@@ -137,6 +137,15 @@ h6 { font-size: var(--font-size-sm); line-height: var(--line-height-normal); fon
 .btn--action:hover { background: var(--color-accent-hover); }
 .btn--action:active { background: var(--color-accent-active); transform: translateY(0.5px); }
 
+/* New semantic variants */
+.btn--success { background: var(--color-success); color: #ffffff; }
+.btn--success:hover { filter: brightness(0.95); }
+.btn--success:active { filter: brightness(0.9); transform: translateY(0.5px); }
+
+.btn--danger { background: var(--color-danger); color: #ffffff; }
+.btn--danger:hover { filter: brightness(0.95); }
+.btn--danger:active { filter: brightness(0.9); transform: translateY(0.5px); }
+
 .btn--outline { background: transparent; border: var(--border-width) solid var(--color-border); color: var(--color-text); }
 .btn--outline:hover { border-color: var(--color-text); }
 

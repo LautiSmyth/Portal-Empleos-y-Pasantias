@@ -325,10 +325,10 @@ const AdminDashboard: React.FC = () => {
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Panel de Administración</h1>
       <div className="flex items-center gap-3">
-        <Link to="/dashboard/admin/jobs" className="btn border border-gray-300 bg-white hover:bg-gray-50">
+        <Link to="/dashboard/admin/jobs" className="btn btn--secondary btn--md">
           Gestionar puestos
         </Link>
-        <Link to="/dashboard/admin/cv" className="btn border border-gray-300 bg-white hover:bg-gray-50">
+        <Link to="/dashboard/admin/cv" className="btn btn--outline btn--md">
           CV del Admin
         </Link>
       </div>

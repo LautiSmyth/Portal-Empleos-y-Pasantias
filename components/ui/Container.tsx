@@ -1,7 +1,7 @@
 import React from 'react';
 
 export type ContainerProps = React.HTMLAttributes<HTMLDivElement> & {
-  as?: keyof JSX.IntrinsicElements;
+  as?: React.ElementType;
 };
 
 export const Container: React.FC<ContainerProps> = ({ as = 'div', className, children, ...rest }) => {

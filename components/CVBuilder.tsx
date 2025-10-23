@@ -141,7 +141,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">{title}</h1>
         {backLink && (
-          <Link to={backLink} className="text-blue-600 hover:underline">← Volver</Link>
+          <Link to={backLink} className="btn btn--outline btn--sm">← Volver</Link>
         )}
       </div>
 
@@ -184,7 +184,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Formación académica</h2>
-              <button onClick={() => addItem('education')} className="px-3 py-1 bg-blue-600 text-white rounded">Agregar</button>
+              <button onClick={() => addItem('education')} className="btn btn--action btn--sm">Agregar</button>
             </div>
             <div className="space-y-4">
               {cv.education.map((ed, idx) => (
@@ -209,7 +209,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     arr[idx] = { ...ed, end: e.target.value };
                     setCv({ ...cv, education: arr });
                   }} />
-                  <button onClick={() => removeItem('education', idx)} className="bg-red-500 text-white rounded px-2">Borrar</button>
+                  <button onClick={() => removeItem('education', idx)} className="btn btn--danger btn--sm">Borrar</button>
                 </div>
               ))}
             </div>
@@ -218,7 +218,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Experiencia laboral</h2>
-              <button onClick={() => addItem('experience')} className="px-3 py-1 bg-blue-600 text-white rounded">Agregar</button>
+              <button onClick={() => addItem('experience')} className="btn btn--action btn--sm">Agregar</button>
             </div>
             <div className="space-y-4">
               {cv.experience.map((ex, idx) => (
@@ -248,7 +248,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     arr[idx] = { ...ex, end: e.target.value };
                     setCv({ ...cv, experience: arr });
                   }} />
-                  <button onClick={() => removeItem('experience', idx)} className="bg-red-500 text-white rounded px-2">Borrar</button>
+                  <button onClick={() => removeItem('experience', idx)} className="btn btn--danger btn--sm">Borrar</button>
                 </div>
               ))}
             </div>
@@ -257,7 +257,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Proyectos</h2>
-              <button onClick={() => addItem('projects')} className="px-3 py-1 bg-blue-600 text-white rounded">Agregar</button>
+              <button onClick={() => addItem('projects')} className="btn btn--action btn--sm">Agregar</button>
             </div>
             <div className="space-y-4">
               {cv.projects.map((p, idx) => (
@@ -282,7 +282,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     arr[idx] = { ...p, description: e.target.value };
                     setCv({ ...cv, projects: arr });
                   }} />
-                  <button onClick={() => removeItem('projects', idx)} className="bg-red-500 text-white rounded px-2">Borrar</button>
+                  <button onClick={() => removeItem('projects', idx)} className="btn btn--danger btn--sm">Borrar</button>
                 </div>
               ))}
             </div>
@@ -291,7 +291,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Habilidades</h2>
-              <button onClick={() => addItem('skills')} className="px-3 py-1 bg-blue-600 text-white rounded">Agregar</button>
+              <button onClick={() => addItem('skills')} className="btn btn--action btn--sm">Agregar</button>
             </div>
             <div className="space-y-3">
               {cv.skills.map((s, idx) => (
@@ -314,7 +314,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Habilidades blandas</h2>
-              <button onClick={() => addItem('softSkills')} className="px-3 py-1 bg-blue-600 text-white rounded">Agregar</button>
+              <button onClick={() => addItem('softSkills')} className="btn btn--action btn--sm">Agregar</button>
             </div>
             <div className="space-y-3">
               {cv.softSkills.map((s, idx) => (
@@ -324,7 +324,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     arr[idx] = e.target.value;
                     setCv({ ...cv, softSkills: arr });
                   }} />
-                  <button onClick={() => removeItem('softSkills', idx)} className="bg-red-500 text-white rounded px-2">Borrar</button>
+                  <button onClick={() => removeItem('softSkills', idx)} className="btn btn--danger btn--sm">Borrar</button>
                 </div>
               ))}
             </div>
@@ -333,7 +333,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Idiomas</h2>
-              <button onClick={() => addItem('languages')} className="px-3 py-1 bg-blue-600 text-white rounded">Agregar</button>
+              <button onClick={() => addItem('languages')} className="btn btn--action btn--sm">Agregar</button>
             </div>
             <div className="space-y-3">
               {cv.languages.map((l, idx) => (
@@ -353,7 +353,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     arr[idx] = { ...l, spoken: e.target.value };
                     setCv({ ...cv, languages: arr });
                   }} />
-                  <button onClick={() => removeItem('languages', idx)} className="bg-red-500 text-white rounded px-2">Borrar</button>
+                  <button onClick={() => removeItem('languages', idx)} className="btn btn--danger btn--sm">Borrar</button>
                 </div>
               ))}
             </div>
@@ -370,7 +370,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
       )}
 
       <div>
-        <button onClick={save} disabled={saving || loading} className="px-6 py-2 bg-green-600 text-white rounded font-semibold disabled:opacity-50 disabled:cursor-not-allowed">{saving ? 'Guardando...' : 'Guardar CV'}</button>
+        <button onClick={save} disabled={saving || loading} className="btn btn--success btn--md">{saving ? 'Guardando...' : 'Guardar CV'}</button>
       </div>
     </div>
   );

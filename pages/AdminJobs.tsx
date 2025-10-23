@@ -217,7 +217,7 @@ const AdminJobs: React.FC = () => {
           </select>
         </div>
         <div className="flex justify-end">
-          <button disabled={!canSubmit || submitting} onClick={handleCreateJob} className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50">{submitting ? 'Creando…' : 'Crear Puesto'}</button>
+          <button disabled={!canSubmit || submitting} onClick={handleCreateJob} className="btn btn--primary btn--md">{submitting ? 'Creando…' : 'Crear Puesto'}</button>
         </div>
       </div>
 
@@ -272,8 +272,8 @@ const AdminJobs: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-2">
-                    <button className="px-3 py-1 bg-gray-200 text-gray-800 rounded" onClick={cancelEditing}>Cancelar</button>
-                    <button className="px-3 py-1 bg-blue-600 text-white rounded disabled:opacity-50" disabled={submitting} onClick={saveEditing}>{submitting ? 'Guardando…' : 'Guardar'}</button>
+                    <button className="btn btn--outline btn--sm" onClick={cancelEditing}>Cancelar</button>
+                    <button className="btn btn--primary btn--sm" disabled={submitting} onClick={saveEditing}>{submitting ? 'Guardando…' : 'Guardar'}</button>
                   </div>
                 </div>
               ) : (
@@ -283,8 +283,8 @@ const AdminJobs: React.FC = () => {
                     <p className="text-sm text-gray-500">{j.area} • {j.location} • {j.modality}</p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <button className="px-3 py-1 bg-gray-200 text-gray-800 rounded" onClick={() => setEditing(j.id)}>Editar</button>
-                    <button className="px-3 py-1 bg-yellow-500 text-white rounded" onClick={() => handleToggleActive(j.id, !(j as any).is_active)}>{(j as any).is_active ? 'Desactivar' : 'Activar'}</button>
+                    <button className="btn btn--outline btn--sm" onClick={() => setEditing(j.id)}>Editar</button>
+                    <button className="btn btn--secondary btn--sm" onClick={() => handleToggleActive(j.id, !(j as any).is_active)}>{(j as any).is_active ? 'Desactivar' : 'Activar'}</button>
                   </div>
                 </div>
               )}
