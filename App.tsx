@@ -99,6 +99,25 @@ const App: React.FC = () => {
     };
     const role = normalizeRole((profileData?.role as string | undefined) ?? metaRole);
 
+    // Asegurar sincronización mínima del perfil: setear nombre si falta y rol
+    try {
+      const meta = (user.user_metadata as any) || {};
+      const desiredName = meta.name || meta.company_name || undefined;
+      if (!profileData?.role) {
+        await supabase.from('profiles').upsert({ id: user.id, role });
+      }
+      if (desiredName && !profileData?.first_name) {
+        await supabase.from('profiles').upsert({ id: user.id, first_name: desiredName });
+        // Refrescar profileData en memoria para que el nombre no aparezca vacío
+        const { data: refreshedProfile } = await supabase
+          .from('profiles')
+          .select('role, first_name, company_verified')
+          .eq('id', user.id)
+          .maybeSingle();
+        if (refreshedProfile) (profileData as any) = refreshedProfile;
+      }
+    } catch (_) {}
+
     // Asegurar la existencia de la empresa para cuentas COMPANY
     try {
       if (role === Role.COMPANY) {
