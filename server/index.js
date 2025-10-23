@@ -214,9 +214,63 @@ fastify.post('/delete-user', async (req, reply) => {
 })
 
 // Start
-const PORT = Number(process.env.PORT || 8787)
-fastify.listen({ port: PORT, host: '0.0.0.0' }).then(() => {
-  fastify.log.info(`Admin API running on http://localhost:${PORT}`)
+/* Start moved below */
+
+// Toggle job active
+fastify.post('/toggle-job-active', async (req, reply) => {
+  if (!requireAdminToken(req, reply)) return
+  const { job_id, active } = req.body || {}
+  if (!job_id || typeof active !== 'boolean') return reply.code(400).send({ ok: false, error: 'job_id y active (boolean) requeridos' })
+  try {
+    const { error } = await supabase
+      .from('jobs')
+      .update({ is_active: active })
+      .eq('id', job_id)
+    if (error) return reply.code(400).send({ ok: false, error: error.message || 'No se pudo actualizar estado del puesto' })
+    return reply.send({ ok: true })
+  } catch (e) {
+    return reply.code(500).send({ ok: false, error: e?.message || 'Fallo inesperado' })
+  }
+})
+
+// Toggle company suspended
+fastify.post('/toggle-company-suspended', async (req, reply) => {
+  if (!requireAdminToken(req, reply)) return
+  const { company_id, suspended } = req.body || {}
+  if (!company_id || typeof suspended !== 'boolean') return reply.code(400).send({ ok: false, error: 'company_id y suspended (boolean) requeridos' })
+  try {
+    const { error } = await supabase
+      .from('companies')
+      .update({ suspended })
+      .eq('id', company_id)
+    if (error) return reply.code(400).send({ ok: false, error: error.message || 'No se pudo actualizar estado de la empresa' })
+    return reply.send({ ok: true })
+  } catch (e) {
+    return reply.code(500).send({ ok: false, error: e?.message || 'Fallo inesperado' })
+  }
+})
+
+// Update application status
+fastify.post('/update-application-status', async (req, reply) => {
+  if (!requireAdminToken(req, reply)) return
+  const { app_id, new_status } = req.body || {}
+  if (!app_id || !new_status) return reply.code(400).send({ ok: false, error: 'app_id y new_status requeridos' })
+  try {
+    const { error } = await supabase
+      .from('applications')
+      .update({ status: new_status })
+      .eq('id', app_id)
+    if (error) return reply.code(400).send({ ok: false, error: error.message || 'No se pudo actualizar estado de la postulación' })
+    return reply.send({ ok: true })
+  } catch (e) {
+    return reply.code(500).send({ ok: false, error: e?.message || 'Fallo inesperado' })
+  }
+})
+
+// Start
+const PORT2 = Number(process.env.PORT || 8787)
+fastify.listen({ port: PORT2, host: '0.0.0.0' }).then(() => {
+  fastify.log.info(`Admin API running on http://localhost:${PORT2}`)
 }).catch(err => {
   fastify.log.error(err)
   process.exit(1)

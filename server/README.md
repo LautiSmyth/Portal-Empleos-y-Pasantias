@@ -23,6 +23,15 @@ Admin API para operaciones privilegiadas usando Supabase Service Role.
 - `POST /authorize-user` — marca email como confirmado.
   - body: `{ user_id? , email? }` (requiere al menos uno)
   - devuelve: `{ ok }`
+- `POST /toggle-job-active` — activa/desactiva un puesto.
+  - body: `{ job_id, active }`
+  - devuelve: `{ ok }`
+- `POST /toggle-company-suspended` — suspende/activa una empresa.
+  - body: `{ company_id, suspended }`
+  - devuelve: `{ ok }`
+- `POST /update-application-status` — actualiza estado de una postulación.
+  - body: `{ app_id, new_status }`
+  - devuelve: `{ ok }`
 
 ## Variables de entorno
 

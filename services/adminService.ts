@@ -2,18 +2,72 @@ import { supabase } from './supabaseClient'
 import { ApplicationStatus, Role } from '../types'
 
 export async function updateApplicationStatus(appId: string, newStatus: ApplicationStatus): Promise<{ ok: boolean; error?: string }> {
+  const adminApiUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
+  if (adminApiUrl) {
+    try {
+      const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['X-Admin-Token'] = token
+      const res = await fetch(`${adminApiUrl}/update-application-status`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ app_id: appId, new_status: newStatus }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) return { ok: false, error: json?.error || 'No se pudo actualizar el estado de la postulación' }
+      return { ok: true }
+    } catch (e: any) {
+      // fallback más abajo
+    }
+  }
   const { error } = await supabase.rpc('admin_update_application_status', { app_id: appId, new_status: newStatus })
   if (error) return { ok: false, error: error.message || 'No se pudo actualizar el estado de la postulación' }
   return { ok: true }
 }
 
 export async function toggleJobActive(jobId: string, active: boolean): Promise<{ ok: boolean; error?: string }> {
+  const adminApiUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
+  if (adminApiUrl) {
+    try {
+      const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['X-Admin-Token'] = token
+      const res = await fetch(`${adminApiUrl}/toggle-job-active`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ job_id: jobId, active }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) return { ok: false, error: json?.error || 'No se pudo actualizar el estado del puesto' }
+      return { ok: true }
+    } catch (e: any) {
+      // fallback más abajo
+    }
+  }
   const { error } = await supabase.rpc('admin_toggle_job_active', { job_id: jobId, active })
   if (error) return { ok: false, error: error.message || 'No se pudo actualizar el estado del puesto' }
   return { ok: true }
 }
 
 export async function toggleCompanySuspended(companyId: string, suspended: boolean): Promise<{ ok: boolean; error?: string }> {
+  const adminApiUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
+  if (adminApiUrl) {
+    try {
+      const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+      if (token) headers['X-Admin-Token'] = token
+      const res = await fetch(`${adminApiUrl}/toggle-company-suspended`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ company_id: companyId, suspended }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) return { ok: false, error: json?.error || 'No se pudo actualizar el estado de la empresa' }
+      return { ok: true }
+    } catch (e: any) {
+      // fallback más abajo
+    }
+  }
   const { error } = await supabase.rpc('admin_toggle_company_suspended', { company_id: companyId, suspended })
   if (error) return { ok: false, error: error.message || 'No se pudo actualizar el estado de la empresa' }
   return { ok: true }
