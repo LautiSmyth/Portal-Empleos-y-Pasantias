@@ -204,3 +204,25 @@ export async function authorizeUserAccount(params: { userId?: string; email?: st
     return { ok: false, error: e?.message || 'No se pudo contactar al API admin' }
   }
 }
+
+export async function deleteUserViaAdminApi(params: { userId?: string; email?: string }): Promise<{ ok: boolean; error?: string }> {
+  const adminApiUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
+  if (!adminApiUrl) {
+    return { ok: false, error: 'Configurar VITE_ADMIN_API_URL para eliminar cuentas (requiere Service Role).' }
+  }
+  try {
+    const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' }
+    if (token) headers['X-Admin-Token'] = token
+    const res = await fetch(`${adminApiUrl}/delete-user`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ user_id: params.userId, email: params.email }),
+    })
+    const json = await res.json().catch(() => ({}))
+    if (!res.ok) return { ok: false, error: json?.error || 'Fallo al eliminar usuario' }
+    return { ok: true }
+  } catch (e: any) {
+    return { ok: false, error: e?.message || 'No se pudo contactar al API admin' }
+  }
+}

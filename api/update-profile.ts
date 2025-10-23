@@ -21,6 +21,20 @@ export default async function handler(req: any, res: any) {
   if (!user_id) return res.status(400).json({ ok: false, error: 'user_id requerido' })
   try {
     const supabase = getSupabaseAdmin()
+
+    // 1) Actualizar user_metadata para mantener consistencia con el cliente (App.tsx deriva rol y nombre).
+    if (first_name !== undefined || role !== undefined) {
+      const currentMeta: any = {}
+      if (first_name !== undefined) currentMeta.name = first_name
+      if (role !== undefined && role) currentMeta.role = role
+      const { error: metaErr } = await supabase.auth.admin.updateUserById(user_id, { user_metadata: currentMeta })
+      if (metaErr) {
+        // No abortar completamente: registramos warning pero seguimos con profiles
+        console.warn('update-profile: fallo al actualizar user_metadata', metaErr)
+      }
+    }
+
+    // 2) Actualizar tabla profiles
     const payload: any = {}
     if (first_name !== undefined) payload.first_name = first_name
     if (university !== undefined) payload.university = university

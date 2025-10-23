@@ -71,16 +71,27 @@ fastify.post('/reset-password', async (req, reply) => {
   }
 })
 
-// Update profile (first_name, university, role)
+// Update profile (first_name, university, role) + sync user_metadata (name/role)
 fastify.post('/update-profile', async (req, reply) => {
   if (!requireAdminToken(req, reply)) return
-  const { user_id, first_name = null, university = null, role = null } = req.body || {}
+  const { user_id, first_name = null, university = null, role = null, company_verified = undefined } = req.body || {}
   if (!user_id) return reply.code(400).send({ ok: false, error: 'user_id requerido' })
   try {
+    // 1) Sincronizar user_metadata (name/role) para que el cliente refleje cambios aunque falte profile
+    if (first_name !== undefined || role !== undefined) {
+      const meta = {}
+      if (first_name !== undefined) meta.name = first_name
+      if (role !== undefined && role) meta.role = role
+      const { error: metaErr } = await supabase.auth.admin.updateUserById(user_id, { user_metadata: meta })
+      if (metaErr) fastify.log.warn({ msg: 'update-profile: failed to update user_metadata', error: metaErr })
+    }
+
+    // 2) Actualizar tabla profiles
     const payload = {}
     if (first_name !== undefined) payload.first_name = first_name
     if (university !== undefined) payload.university = university
     if (role !== undefined && role) payload.role = role
+    if (company_verified !== undefined) payload.company_verified = company_verified
     const { error } = await supabase
       .from('profiles')
       .update(payload)
@@ -167,6 +178,35 @@ fastify.post('/authorize-user', async (req, reply) => {
     }
     const { error } = await supabase.auth.admin.updateUserById(user_id, { email_confirm: true })
     if (error) return reply.code(400).send({ ok: false, error: error.message || 'No se pudo autorizar la cuenta' })
+    return reply.send({ ok: true })
+  } catch (e) {
+    return reply.code(500).send({ ok: false, error: e?.message || 'Fallo inesperado' })
+  }
+})
+
+// Baja de usuario (elimina auth.users y su profile)
+fastify.post('/delete-user', async (req, reply) => {
+  if (!requireAdminToken(req, reply)) return
+  let { user_id, email } = req.body || {}
+  if (!user_id && !email) return reply.code(400).send({ ok: false, error: 'user_id o email requerido' })
+  try {
+    if (!user_id) {
+      const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 })
+      if (error) return reply.code(400).send({ ok: false, error: error.message || 'No se pudo obtener usuarios' })
+      const found = (data?.users || []).find(u => (u.email || '').toLowerCase() === (email || '').toLowerCase())
+      if (!found) return reply.code(404).send({ ok: false, error: 'Usuario no encontrado por email' })
+      user_id = found.id
+    }
+
+    const { error: delErr } = await supabase.auth.admin.deleteUser(user_id)
+    if (delErr) return reply.code(400).send({ ok: false, error: delErr.message || 'No se pudo eliminar usuario' })
+
+    const { error: pErr } = await supabase
+      .from('profiles')
+      .delete()
+      .eq('id', user_id)
+    if (pErr) fastify.log.warn({ msg: 'delete-user: fallo al eliminar perfil', error: pErr })
+
     return reply.send({ ok: true })
   } catch (e) {
     return reply.code(500).send({ ok: false, error: e?.message || 'Fallo inesperado' })
