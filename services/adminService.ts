@@ -73,35 +73,40 @@ export async function adminUpdateProfile(payload: { userId: string; firstName?: 
       const res = await fetch(`${adminApiUrl}/update-profile`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          user_id: payload.userId,
-          first_name: payload.firstName ?? null,
-          university: payload.university ?? null,
-          role: payload.role ?? null,
-          company_verified: payload.companyVerified ?? undefined,
-        }),
+        body: JSON.stringify((() => {
+          const b: any = { user_id: payload.userId }
+          if (payload.firstName !== undefined) b.first_name = payload.firstName
+          if (payload.university !== undefined) b.university = payload.university
+          if (payload.role !== undefined) b.role = payload.role
+          if (payload.companyVerified !== undefined) b.company_verified = payload.companyVerified
+          return b
+        })()),
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok) return { ok: false, error: json?.error || 'Fallo al actualizar perfil en API admin' }
       return { ok: true }
     }
 
-    // Fallback a RPC
-    const { error: rpcErr } = await supabase.rpc('admin_update_profile', {
-      user_id: payload.userId,
-      first_name: payload.firstName ?? null,
-      university: payload.university ?? null,
-      role: payload.role ?? null,
-      company_verified: payload.companyVerified ?? null,
-    })
+    // Fallback a RPC (en proyectos donde exista la función)
+    const params: any = { user_id: payload.userId }
+    if (payload.firstName !== undefined) params.first_name = payload.firstName
+    if (payload.university !== undefined) params.university = payload.university
+    if (payload.role !== undefined) params.role = payload.role
+    if (payload.companyVerified !== undefined) params.company_verified = payload.companyVerified
+    const { error: rpcErr } = await supabase.rpc('admin_update_profile', params)
     if (rpcErr) return { ok: false, error: rpcErr.message || 'No se pudo actualizar perfil (RPC)' }
     return { ok: true }
   } catch (e: any) {
     // Último recurso: update directo (puede fallar por RLS)
     try {
+      const updatePayload: any = {}
+      if (payload.firstName !== undefined) updatePayload.first_name = payload.firstName
+      if (payload.university !== undefined) updatePayload.university = payload.university
+      if (payload.role !== undefined) updatePayload.role = payload.role
+      if (payload.companyVerified !== undefined) updatePayload.company_verified = payload.companyVerified
       const { error } = await supabase
         .from('profiles')
-        .update({ first_name: payload.firstName ?? null, university: payload.university ?? null, role: payload.role ?? null, company_verified: payload.companyVerified ?? null })
+        .update(updatePayload)
         .eq('id', payload.userId)
       if (error) return { ok: false, error: error.message || 'No se pudo actualizar perfil (RLS)' }
       return { ok: true }

@@ -99,6 +99,31 @@ const App: React.FC = () => {
     };
     const role = normalizeRole((profileData?.role as string | undefined) ?? metaRole);
 
+    // Asegurar la existencia de la empresa para cuentas COMPANY
+    try {
+      if (role === Role.COMPANY) {
+        const { data: existingCompany, error: fetchCompanyErr } = await supabase
+          .from('companies')
+          .select('id')
+          .eq('owner_id', user.id)
+          .maybeSingle();
+        if (!fetchCompanyErr && !existingCompany) {
+          const meta = (user.user_metadata as any) || {};
+          const insertCompany = {
+            owner_id: user.id,
+            name: meta.company_name || meta.legal_name || meta.name || profileData?.first_name || 'Empresa',
+            email: meta.company_email || user.email || '',
+            legal_name: meta.company_legal_name || '',
+            industry: meta.company_industry || '',
+            hr_contact_name: meta.company_hr_contact || '',
+            logo_url: meta.company_logo_url || null,
+            contact_phone: meta.company_phone || '',
+          };
+          await supabase.from('companies').insert(insertCompany);
+        }
+      }
+    } catch (_) {}
+
     setCurrentUser({
       id: user.id,
       role,
