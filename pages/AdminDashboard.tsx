@@ -106,6 +106,7 @@ const AdminDashboard: React.FC = () => {
   const [editRole, setEditRole] = useState<Role>(Role.STUDENT);
   const [savingProfile, setSavingProfile] = useState(false);
   const [authorizingUserId, setAuthorizingUserId] = useState<string | null>(null);
+  const [verifyingCompanyUserId, setVerifyingCompanyUserId] = useState<string | null>(null);
 
   // Filtros de usuarios
   const [filterRole, setFilterRole] = useState<Role | 'ALL'>('ALL');
@@ -285,6 +286,33 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleVerifyCompany = async (userId: string) => {
+    if (!auth?.currentUser) return;
+    setVerifyingCompanyUserId(userId);
+    try {
+      const res = await adminUpdateProfile({ userId, companyVerified: true });
+      if (!res.ok) throw new Error(res.error || 'No se pudo verificar la empresa');
+      await logAdminAction({
+        actorId: auth.currentUser.id,
+        action: 'verify_company',
+        entity: 'profiles',
+        entityId: userId,
+        details: { via: 'admin_api' },
+      });
+      const refreshed = await searchProfiles({
+        email: filterEmail || undefined,
+        role: filterRole,
+        universityLike: filterUniversity || undefined,
+        limit: 20,
+      });
+      setRecentProfiles(refreshed || []);
+    } catch (e: any) {
+      setError(e?.message || 'Error al verificar empresa');
+    } finally {
+      setVerifyingCompanyUserId(null);
+    }
+  };
+
   const saveEditProfile = async () => {
     if (!editingProfileId || !auth?.currentUser) return;
     setSavingProfile(true);
@@ -424,6 +452,15 @@ const AdminDashboard: React.FC = () => {
                   >
                     Autorizar
                   </button>
+                  {p.role === 'COMPANY' && (
+                    <button
+                      className="px-3 py-1 text-sm rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-50"
+                      onClick={() => handleVerifyCompany(p.id)}
+                      disabled={verifyingCompanyUserId === p.id || p.company_verified === true}
+                    >
+                      Verificar empresa
+                    </button>
+                  )}
                 </div>
               </div>
               {editingProfileId === p.id && (
