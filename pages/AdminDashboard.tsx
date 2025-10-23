@@ -58,9 +58,8 @@ function UserCreateForm() {
         </button>
         {message && <span className="text-sm text-gray-700">{message}</span>}
       </div>
-      <p className="md:col-span-2 text-xs text-gray-500">
-        Requiere configurar `VITE_ADMIN_API_URL` apuntando a un backend con Service Role de Supabase.
-      </p>
+      {/* Aviso removido para no interferir con el diseño */}
+      {/* <p className="md:col-span-2 text-xs text-gray-500">Requiere configurar `VITE_ADMIN_API_URL` apuntando a un backend con Service Role de Supabase.</p> */}
     </form>
   )
 }
@@ -325,14 +324,14 @@ const AdminDashboard: React.FC = () => {
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold">Panel de Administración</h1>
-+     <div className="flex items-center gap-3">
-+       <Link to="/dashboard/admin/jobs" className="px-3 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300">
-+         Gestionar puestos
-+       </Link>
-+       <Link to="/dashboard/admin/cv" className="px-3 py-2 text-sm rounded bg-gray-200 hover:bg-gray-300">
-+         CV del Admin
-+       </Link>
-+     </div>
+      <div className="flex items-center gap-3">
+        <Link to="/dashboard/admin/jobs" className="btn border border-gray-300 bg-white hover:bg-gray-50">
+          Gestionar puestos
+        </Link>
+        <Link to="/dashboard/admin/cv" className="btn border border-gray-300 bg-white hover:bg-gray-50">
+          CV del Admin
+        </Link>
+      </div>
       {error && <div className="p-3 rounded bg-red-50 text-red-700">{error}</div>}
       {loading && <div className="text-gray-600">Cargando...</div>}
 
@@ -388,7 +387,8 @@ const AdminDashboard: React.FC = () => {
           <div className="md:col-span-2">
             <label className="block text-xs text-gray-700">Email</label>
             <input className="mt-1 w-full border rounded p-2" value={filterEmail} onChange={(e) => setFilterEmail(e.target.value)} placeholder="usuario@dominio.com" />
-            <p className="text-xs text-gray-500 mt-1">Para email se requiere API admin configurada.</p>
+            {/* Nota removida para limpiar el diseño */}
+            {/* <p className="text-xs text-gray-500 mt-1">Para email se requiere API admin configurada.</p> */}
           </div>
           <div className="flex items-end gap-2">
             <button className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" onClick={handleSearchProfiles} disabled={searchingProfiles}>Buscar</button>
@@ -597,9 +597,8 @@ function PasswordResetForm() {
           Link de recuperación generado (para pruebas): <a href={actionLink} target="_blank" rel="noreferrer" className="text-blue-600 underline">{actionLink}</a>
         </div>
       )}
-      <p className="md:col-span-2 text-xs text-gray-500">
-        Requiere `VITE_ADMIN_API_URL` y un backend con Service Role generando links de recuperación para alumnos y empresas.
-      </p>
+      {/* Aviso removido para no interferir con el diseño */}
+      {/* <p className="md:col-span-2 text-xs text-gray-500">Requiere `VITE_ADMIN_API_URL` y un backend con Service Role generando links de recuperación para alumnos y empresas.</p> */}
     </form>
   )
 }
