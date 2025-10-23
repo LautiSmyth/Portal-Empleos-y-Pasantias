@@ -29,9 +29,60 @@ export default async function handler(req: any, res: any) {
       user_id = found.id
     }
 
-    // Eliminar del auth.users (incluye metadata)
-    const { error: delErr } = await supabase.auth.admin.deleteUser(user_id)
-    if (delErr) return res.status(400).json({ ok: false, error: delErr.message || 'No se pudo eliminar usuario' })
+    // Consultar rol del perfil para definir borrado en cascada
+    const { data: profile, error: profErr } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user_id)
+      .maybeSingle()
+    if (profErr) console.warn('delete-user: error obteniendo perfil', profErr)
+    const role = (profile as any)?.role || null
+
+    // Borrado en cascada según rol
+    if (role === 'COMPANY') {
+      const { data: companies, error: compErr } = await supabase
+        .from('companies')
+        .select('id')
+        .eq('owner_id', user_id)
+      if (compErr) console.warn('delete-user: error listando companies', compErr)
+      const companyIds: string[] = Array.isArray(companies) ? companies.map((c: any) => c.id) : []
+      if (companyIds.length > 0) {
+        const { data: jobs, error: jobsErr } = await supabase
+          .from('jobs')
+          .select('id')
+          .in('company_id', companyIds)
+        if (jobsErr) console.warn('delete-user: error listando jobs', jobsErr)
+        const jobIds: string[] = Array.isArray(jobs) ? jobs.map((j: any) => j.id) : []
+        if (jobIds.length > 0) {
+          const { error: appsDelErr } = await supabase
+            .from('applications')
+            .delete()
+            .in('job_id', jobIds)
+          if (appsDelErr) console.warn('delete-user: fallo borrando applications', appsDelErr)
+        }
+        const { error: jobsDelErr } = await supabase
+          .from('jobs')
+          .delete()
+          .in('company_id', companyIds)
+        if (jobsDelErr) console.warn('delete-user: fallo borrando jobs', jobsDelErr)
+        const { error: compsDelErr } = await supabase
+          .from('companies')
+          .delete()
+          .in('id', companyIds)
+        if (compsDelErr) console.warn('delete-user: fallo borrando companies', compsDelErr)
+      }
+    } else if (role === 'STUDENT') {
+      const { error: appsDelErr } = await supabase
+        .from('applications')
+        .delete()
+        .eq('student_id', user_id)
+      if (appsDelErr) console.warn('delete-user: fallo borrando applications del estudiante', appsDelErr)
+      const { error: cvsDelErr } = await supabase
+        .from('cvs')
+        .delete()
+        .eq('owner_id', user_id)
+      if (cvsDelErr) console.warn('delete-user: fallo borrando cvs', cvsDelErr)
+    }
 
     // Eliminar perfil asociado (si existe)
     const { error: pErr } = await supabase
@@ -39,6 +90,10 @@ export default async function handler(req: any, res: any) {
       .delete()
       .eq('id', user_id)
     if (pErr) console.warn('delete-user: fallo al eliminar perfil', pErr)
+
+    // Eliminar del auth.users (incluye metadata)
+    const { error: delErr } = await supabase.auth.admin.deleteUser(user_id)
+    if (delErr) return res.status(400).json({ ok: false, error: delErr.message || 'No se pudo eliminar usuario' })
 
     return res.status(200).json({ ok: true })
   } catch (e: any) {

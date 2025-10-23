@@ -74,7 +74,27 @@ fastify.post('/reset-password', async (req, reply) => {
 // Update profile (first_name, university, role) + sync user_metadata (name/role)
 fastify.post('/update-profile', async (req, reply) => {
   if (!requireAdminToken(req, reply)) return
-  const { user_id, first_name = null, university = null, role = null, company_verified = undefined } = req.body || {}
+  const body = req.body || {}
+  const user_id = body?.user_id
+  const has = (k) => Object.prototype.hasOwnProperty.call(body, k)
+  const first_name_raw = has('first_name') ? body.first_name : undefined
+  const university_raw = has('university') ? body.university : undefined
+  const role_raw = has('role') ? body.role : undefined
+  const company_verified_raw = has('company_verified') ? body.company_verified : undefined
+
+  const sanitizeOptionalString = (v) => {
+    if (v === undefined) return undefined
+    if (v === null) return undefined
+    if (typeof v === 'string' && v.trim() === '') return undefined
+    if (typeof v === 'string') return v
+    return undefined
+  }
+
+  const first_name = sanitizeOptionalString(first_name_raw)
+  const university = sanitizeOptionalString(university_raw)
+  const role = (typeof role_raw === 'string' && role_raw.trim() !== '') ? role_raw : undefined
+  const company_verified = typeof company_verified_raw === 'boolean' ? company_verified_raw : undefined
+
   if (!user_id) return reply.code(400).send({ ok: false, error: 'user_id requerido' })
   try {
     // 1) Sincronizar user_metadata (name/role) para que el cliente refleje cambios aunque falte profile
@@ -86,12 +106,14 @@ fastify.post('/update-profile', async (req, reply) => {
       if (metaErr) fastify.log.warn({ msg: 'update-profile: failed to update user_metadata', error: metaErr })
     }
 
-    // 2) Actualizar tabla profiles
+    // 2) Actualizar tabla profiles (ignorando strings vacíos y nulls)
     const payload = {}
     if (first_name !== undefined) payload.first_name = first_name
     if (university !== undefined) payload.university = university
     if (role !== undefined && role) payload.role = role
     if (company_verified !== undefined) payload.company_verified = company_verified
+    if (Object.keys(payload).length === 0) return reply.code(400).send({ ok: false, error: 'No hay campos válidos para actualizar' })
+
     const { error } = await supabase
       .from('profiles')
       .update(payload)
@@ -198,14 +220,69 @@ fastify.post('/delete-user', async (req, reply) => {
       user_id = found.id
     }
 
-    const { error: delErr } = await supabase.auth.admin.deleteUser(user_id)
-    if (delErr) return reply.code(400).send({ ok: false, error: delErr.message || 'No se pudo eliminar usuario' })
+    // Consultar rol para definir borrado en cascada
+    const { data: profile, error: profErr } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user_id)
+      .maybeSingle()
+    if (profErr) fastify.log.warn({ msg: 'delete-user: error obteniendo perfil', error: profErr })
+    const role = profile?.role || null
+
+    // Borrado en cascada
+    if (role === 'COMPANY') {
+      const { data: companies, error: compErr } = await supabase
+        .from('companies')
+        .select('id')
+        .eq('owner_id', user_id)
+      if (compErr) fastify.log.warn({ msg: 'delete-user: error listando companies', error: compErr })
+      const companyIds = Array.isArray(companies) ? companies.map(c => c.id) : []
+      if (companyIds.length > 0) {
+        const { data: jobs, error: jobsErr } = await supabase
+          .from('jobs')
+          .select('id')
+          .in('company_id', companyIds)
+        if (jobsErr) fastify.log.warn({ msg: 'delete-user: error listando jobs', error: jobsErr })
+        const jobIds = Array.isArray(jobs) ? jobs.map(j => j.id) : []
+        if (jobIds.length > 0) {
+          const { error: appsDelErr } = await supabase
+            .from('applications')
+            .delete()
+            .in('job_id', jobIds)
+          if (appsDelErr) fastify.log.warn({ msg: 'delete-user: fallo borrando applications', error: appsDelErr })
+        }
+        const { error: jobsDelErr } = await supabase
+          .from('jobs')
+          .delete()
+          .in('company_id', companyIds)
+        if (jobsDelErr) fastify.log.warn({ msg: 'delete-user: fallo borrando jobs', error: jobsDelErr })
+        const { error: compsDelErr } = await supabase
+          .from('companies')
+          .delete()
+          .in('id', companyIds)
+        if (compsDelErr) fastify.log.warn({ msg: 'delete-user: fallo borrando companies', error: compsDelErr })
+      }
+    } else if (role === 'STUDENT') {
+      const { error: appsDelErr } = await supabase
+        .from('applications')
+        .delete()
+        .eq('student_id', user_id)
+      if (appsDelErr) fastify.log.warn({ msg: 'delete-user: fallo borrando applications del estudiante', error: appsDelErr })
+      const { error: cvsDelErr } = await supabase
+        .from('cvs')
+        .delete()
+        .eq('owner_id', user_id)
+      if (cvsDelErr) fastify.log.warn({ msg: 'delete-user: fallo borrando cvs', error: cvsDelErr })
+    }
 
     const { error: pErr } = await supabase
       .from('profiles')
       .delete()
       .eq('id', user_id)
     if (pErr) fastify.log.warn({ msg: 'delete-user: fallo al eliminar perfil', error: pErr })
+
+    const { error: delErr } = await supabase.auth.admin.deleteUser(user_id)
+    if (delErr) return reply.code(400).send({ ok: false, error: delErr.message || 'No se pudo eliminar usuario' })
 
     return reply.send({ ok: true })
   } catch (e) {
