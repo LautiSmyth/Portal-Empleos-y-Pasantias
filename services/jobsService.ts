@@ -94,9 +94,16 @@ export async function fetchJobsByCompanyId(companyId: string): Promise<Job[]> {
   return (data as DbJobRow[]).map(mapDbRowToJob)
 }
 
+function getEnv(key: string): string {
+  // Prefer process.env presence (even empty string) to allow tests to control behavior
+  const hasProcess = Object.prototype.hasOwnProperty.call(process.env, key)
+  if (hasProcess) return (process.env as any)[key] ?? ''
+  return ((import.meta as any).env?.[key] as string | undefined) ?? ''
+}
+
 export async function createJobViaAdminApi(payload: { title: string; description: string; area: string; location: string; experienceMin: number; salaryMin?: number | null; salaryMax?: number | null; modality: string; companyId: string; isActive?: boolean }): Promise<{ ok: boolean; id?: string; error?: string }> {
-  const envUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
-  const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+  const envUrl = getEnv('VITE_ADMIN_API_URL')
+  const token = getEnv('VITE_ADMIN_API_TOKEN')
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (token) headers['X-Admin-Token'] = token
   const url = envUrl ? `${envUrl}/create-job` : `/api/create-job`
@@ -122,8 +129,8 @@ export async function createJobViaAdminApi(payload: { title: string; description
 }
 
 export async function updateJobViaAdminApi(payload: { jobId: string; title?: string; description?: string; area?: string; location?: string; experienceMin?: number; salaryMin?: number | null; salaryMax?: number | null; modality?: string; isActive?: boolean }): Promise<{ ok: boolean; error?: string }> {
-  const envUrl = (import.meta as any).env?.VITE_ADMIN_API_URL || process.env.VITE_ADMIN_API_URL || ''
-  const token = (import.meta as any).env?.VITE_ADMIN_API_TOKEN || process.env.VITE_ADMIN_API_TOKEN || ''
+  const envUrl = getEnv('VITE_ADMIN_API_URL')
+  const token = getEnv('VITE_ADMIN_API_TOKEN')
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (token) headers['X-Admin-Token'] = token
   const url = envUrl ? `${envUrl}/update-job` : `/api/update-job`

@@ -1,5 +1,5 @@
 /* UniJobs Connect custom styles */
-/* This file prevents 404s and allows small global tweaks. */
+/* Global variables and small design utilities */
 
 html, body, #root {
   height: 100%;
@@ -9,9 +9,59 @@ body {
   margin: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-/* Optional: subtle background for app shell; Tailwind handles most styling. */
 :root {
   color-scheme: light;
+  /* Palette */
+  --color-primary: #2563eb; /* blue-600 */
+  --color-primary-hover: #1d4ed8; /* blue-700 */
+  --color-bg: #f8fafc; /* slate-50 */
+  --color-card: #ffffff;
+  --color-border: #e5e7eb; /* gray-200 */
+  --color-text: #111827; /* gray-900 */
+  --color-muted: #6b7280; /* gray-500 */
+  --radius: 10px;
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+}
+
+/* Design utilities */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--color-primary-hover); }
+
+.card {
+  background: var(--color-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  padding: var(--space-6);
+  margin-bottom: var(--space-4);
+}
+
+.section-title {
+  font-size: 1.125rem; /* text-lg */
+  font-weight: 600; /* font-semibold */
+  margin-bottom: var(--space-2);
 }

@@ -1,24 +1,25 @@
 import React, { useContext } from 'react';
 import { AuthContext } from '../App';
-import { Role } from '../types';
-import StudentCV from './StudentCV';
+import { Role, CV } from '../types';
+import CVViewer from '../components/CVViewer';
 import { jsPDF } from 'jspdf';
 import { Document, Packer, Paragraph, TextRun } from 'docx';
 
-// Pequeño contenedor para añadir acciones de exportación sobre el constructor reutilizado
+// Pequeño contenedor para añadir acciones de exportación sobre el visor reutilizado
 const AdminCV: React.FC = () => {
   const auth = useContext(AuthContext);
   if (!auth?.currentUser || auth.currentUser.role !== Role.ADMIN) {
     return <div className="text-center text-red-600">Debes iniciar sesión como ADMIN.</div>;
   }
 
+  const userId = auth.currentUser.id;
+  const storageKey = `cv_${userId}`;
+  const raw = localStorage.getItem(storageKey);
+  const cv: CV | null = raw ? JSON.parse(raw) as CV : null;
+
   const handleExportPDF = () => {
     try {
-      // Exportación sencilla: toma una captura textual del CV guardado en localStorage
-      const userId = auth.currentUser.id;
-      const storageKey = `cv_${userId}`;
-      const raw = localStorage.getItem(storageKey);
-      const data = raw ? JSON.parse(raw) : null;
+      const data = cv;
       const doc = new jsPDF({ unit: 'pt', format: 'a4' });
       let y = 40;
       doc.setFontSize(16);
@@ -62,10 +63,7 @@ const AdminCV: React.FC = () => {
 
   const handleExportDocx = async () => {
     try {
-      const userId = auth.currentUser.id;
-      const storageKey = `cv_${userId}`;
-      const raw = localStorage.getItem(storageKey);
-      const data = raw ? JSON.parse(raw) : null;
+      const data = cv;
       const children: Paragraph[] = [];
       children.push(new Paragraph({ children: [new TextRun({ text: 'Currículum (ADMIN)', bold: true, size: 28 })] }));
       children.push(new Paragraph(''));
@@ -119,12 +117,18 @@ const AdminCV: React.FC = () => {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">CV del ADMIN</h1>
         <div className="flex items-center gap-3">
-          <button onClick={handleExportPDF} className="px-3 py-2 bg-blue-600 text-white rounded">Descargar PDF</button>
-          <button onClick={handleExportDocx} className="px-3 py-2 bg-indigo-600 text-white rounded">Descargar DOCX</button>
+          <button onClick={handleExportPDF} className="btn btn-primary">Descargar PDF</button>
+          <button onClick={handleExportDocx} className="btn btn-primary">Descargar DOCX</button>
         </div>
       </div>
-      {/* Reutilizamos el mismo constructor */}
-      <StudentCV />
+      {/* Visor reutilizable: muestra el CV si existe */}
+      {cv ? (
+        <CVViewer cv={cv} className="space-y-6" />
+      ) : (
+        <div className="card">
+          <p className="text-gray-600">No se encontró CV para este usuario. Completa el CV desde el constructor.</p>
+        </div>
+      )}
     </div>
   );
 };

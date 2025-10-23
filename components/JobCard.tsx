@@ -6,6 +6,13 @@ import LocationIcon from './icons/LocationIcon';
 import BriefcaseIcon from './icons/BriefcaseIcon';
 import BuildingIcon from './icons/BuildingIcon';
 
+/**
+ * JobCard
+ * Muestra un puesto con información resumida y un CTA a detalles.
+ * Props:
+ * - job: objeto Job (id, title, location, modality, experienceMin, salaryRange, createdAt, companyId)
+ * - company?: objeto Company para logo y nombre (opcional)
+ */
 interface JobCardProps {
   job: Job;
   company?: Company;
@@ -28,7 +35,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, company }) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-lg transition-shadow duration-300 p-6 flex flex-col">
+    <div className="card flex flex-col">
       <div className="flex items-start space-x-4">
         {company && <img src={company.logoUrl} alt={`${company.name} logo`} className="w-16 h-16 rounded-md object-cover"/>}
         <div className="flex-1">
@@ -52,7 +59,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, company }) => {
         <p className="text-xs text-gray-400">{timeSince(job.createdAt)}</p>
         <Link 
           to={`/jobs/${job.id}`} 
-          className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          className="btn btn-primary"
         >
           View Details
         </Link>
