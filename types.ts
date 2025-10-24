@@ -125,6 +125,11 @@ export type TrainingCourse = {
   description: string;
 };
 
+export type ComplementaryKnowledge = {
+  name: string;
+  level: SkillLevel;
+};
+
 export interface CV {
   ownerId: string;
   personal: { 
@@ -151,6 +156,7 @@ export interface CV {
     programming: ProgrammingSkill[];
     managementSystems: ManagementSystemSkill[];
   };
+  complementaryKnowledge: ComplementaryKnowledge[];
   trainingCourses: TrainingCourse[];
   pdfFileName?: string;
   pdfDataUrl?: string;

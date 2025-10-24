@@ -233,6 +233,20 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
         </div>
       )}
 
+      {/* Complementary Knowledge */}
+      {cv.complementaryKnowledge && cv.complementaryKnowledge.length > 0 && (
+        <div className="card">
+          <SectionTitle title="Conocimientos Complementarios" />
+          <div className="flex flex-wrap gap-2">
+            {cv.complementaryKnowledge.map((knowledge, idx) => (
+              <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+                {knowledge.name} (nivel {knowledge.level})
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Skills */}
       <div className="card">
         <SectionTitle title="Habilidades" />

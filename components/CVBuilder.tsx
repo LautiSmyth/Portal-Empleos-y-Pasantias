@@ -2,6 +2,15 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { CV, UniversityCareer, SkillLevel } from '../types';
 import { fetchCVByOwnerId, saveCV } from '../services/cvService';
+import TechnicalSkillSelector from './TechnicalSkillSelector';
+import { 
+  OFFICE_SOFTWARE_OPTIONS, 
+  TECHNICAL_LANGUAGES_OPTIONS, 
+  DESIGN_SOFTWARE_OPTIONS, 
+  PROGRAMMING_MECHATRONICS_OPTIONS, 
+  MANAGEMENT_SYSTEMS_OPTIONS,
+  COMPLEMENTARY_KNOWLEDGE_OPTIONS
+} from '../constants/technicalSkills';
 
 type CVBuilderProps = {
   ownerId: string;
@@ -71,6 +80,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
               managementSystems: []
             },
             trainingCourses: [],
+            complementaryKnowledge: [],
           });
         }
       }
@@ -282,192 +292,108 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
             
             {/* Conocimientos de Ofimática */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-md font-medium">Software de Ofimática</h3>
-                <button onClick={() => addItem('technicalSkills.office')} className="btn btn--action btn--sm">Agregar</button>
-              </div>
-              <div className="space-y-2">
-                {cv.technicalSkills?.office?.map((skill, idx) => (
-                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
-                    <input 
-                      placeholder="Word, Excel, PowerPoint..." 
-                      className="border rounded p-2" 
-                      value={skill.name} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.office || [])];
-                        arr[idx] = { ...skill, name: e.target.value };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, office: arr } });
-                      }} 
-                    />
-                    <select 
-                      className="border rounded p-2" 
-                      value={skill.level} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.office || [])];
-                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, office: arr } });
-                      }}
-                    >
-                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
-                        <option key={level} value={level}>{level}</option>
-                      ))}
-                    </select>
-                    <button onClick={() => removeItem('technicalSkills.office', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-md font-medium mb-3">Software de Ofimática</h3>
+              <TechnicalSkillSelector
+                category="office"
+                predefinedOptions={OFFICE_SOFTWARE_OPTIONS}
+                selectedSkills={cv.technicalSkills?.office || []}
+                onSkillsChange={(skills) => {
+                  setCv({ 
+                    ...cv, 
+                    technicalSkills: { 
+                      ...cv.technicalSkills, 
+                      office: skills 
+                    } 
+                  });
+                }}
+                placeholder="Buscar software de ofimática (Word, Excel, PowerPoint...)"
+              />
             </div>
 
             {/* Conocimientos de Idiomas */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-md font-medium">Idiomas</h3>
-                <button onClick={() => addItem('technicalSkills.languages')} className="btn btn--action btn--sm">Agregar</button>
-              </div>
-              <div className="space-y-2">
-                {cv.technicalSkills?.languages?.map((lang, idx) => (
-                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
-                    <input 
-                      placeholder="Inglés, Francés, Alemán..." 
-                      className="border rounded p-2" 
-                      value={lang.language} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.languages || [])];
-                        arr[idx] = { ...lang, language: e.target.value };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, languages: arr } });
-                      }} 
-                    />
-                    <select 
-                      className="border rounded p-2" 
-                      value={lang.level} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.languages || [])];
-                        arr[idx] = { ...lang, level: e.target.value as SkillLevel };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, languages: arr } });
-                      }}
-                    >
-                      {Object.values(SkillLevel).map((level) => (
-                        <option key={level} value={level}>{level}</option>
-                      ))}
-                    </select>
-                    <button onClick={() => removeItem('technicalSkills.languages', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-md font-medium mb-3">Idiomas</h3>
+              <TechnicalSkillSelector
+                category="languages"
+                predefinedOptions={TECHNICAL_LANGUAGES_OPTIONS}
+                selectedSkills={cv.technicalSkills?.languages?.map(lang => ({ 
+                  name: lang.language, 
+                  level: lang.level 
+                })) || []}
+                onSkillsChange={(skills) => {
+                  setCv({ 
+                    ...cv, 
+                    technicalSkills: { 
+                      ...cv.technicalSkills, 
+                      languages: skills.map(skill => ({ 
+                        language: skill.name, 
+                        level: skill.level 
+                      }))
+                    } 
+                  });
+                }}
+                placeholder="Buscar idiomas (Inglés, Francés, Alemán...)"
+              />
             </div>
 
             {/* Conocimientos de Diseño */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-md font-medium">Software de Diseño</h3>
-                <button onClick={() => addItem('technicalSkills.design')} className="btn btn--action btn--sm">Agregar</button>
-              </div>
-              <div className="space-y-2">
-                {cv.technicalSkills?.design?.map((skill, idx) => (
-                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
-                    <input 
-                      placeholder="Photoshop, Illustrator, AutoCAD..." 
-                      className="border rounded p-2" 
-                      value={skill.name} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.design || [])];
-                        arr[idx] = { ...skill, name: e.target.value };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, design: arr } });
-                      }} 
-                    />
-                    <select 
-                      className="border rounded p-2" 
-                      value={skill.level} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.design || [])];
-                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, design: arr } });
-                      }}
-                    >
-                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
-                        <option key={level} value={level}>{level}</option>
-                      ))}
-                    </select>
-                    <button onClick={() => removeItem('technicalSkills.design', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-md font-medium mb-3">Software de Diseño</h3>
+              <TechnicalSkillSelector
+                category="design"
+                predefinedOptions={DESIGN_SOFTWARE_OPTIONS}
+                selectedSkills={cv.technicalSkills?.design || []}
+                onSkillsChange={(skills) => {
+                  setCv({ 
+                    ...cv, 
+                    technicalSkills: { 
+                      ...cv.technicalSkills, 
+                      design: skills 
+                    } 
+                  });
+                }}
+                placeholder="Buscar software de diseño (Photoshop, Illustrator, AutoCAD...)"
+              />
             </div>
 
             {/* Conocimientos de Programación y Mecatrónica */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-md font-medium">Programación y Mecatrónica</h3>
-                <button onClick={() => addItem('technicalSkills.programming')} className="btn btn--action btn--sm">Agregar</button>
-              </div>
-              <div className="space-y-2">
-                {cv.technicalSkills?.programming?.map((skill, idx) => (
-                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
-                    <input 
-                      placeholder="Python, PLC, MATLAB, CAD..." 
-                      className="border rounded p-2" 
-                      value={skill.name} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.programming || [])];
-                        arr[idx] = { ...skill, name: e.target.value };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, programming: arr } });
-                      }} 
-                    />
-                    <select 
-                      className="border rounded p-2" 
-                      value={skill.level} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.programming || [])];
-                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, programming: arr } });
-                      }}
-                    >
-                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
-                        <option key={level} value={level}>{level}</option>
-                      ))}
-                    </select>
-                    <button onClick={() => removeItem('technicalSkills.programming', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-md font-medium mb-3">Programación y Mecatrónica</h3>
+              <TechnicalSkillSelector
+                category="programming"
+                predefinedOptions={PROGRAMMING_MECHATRONICS_OPTIONS}
+                selectedSkills={cv.technicalSkills?.programming || []}
+                onSkillsChange={(skills) => {
+                  setCv({ 
+                    ...cv, 
+                    technicalSkills: { 
+                      ...cv.technicalSkills, 
+                      programming: skills 
+                    } 
+                  });
+                }}
+                placeholder="Buscar tecnologías (Python, PLC, MATLAB, CAD...)"
+              />
             </div>
 
             {/* Sistemas de Gestión */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-md font-medium">Sistemas de Gestión</h3>
-                <button onClick={() => addItem('technicalSkills.managementSystems')} className="btn btn--action btn--sm">Agregar</button>
-              </div>
-              <div className="space-y-2">
-                {cv.technicalSkills?.managementSystems?.map((skill, idx) => (
-                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
-                    <input 
-                      placeholder="SAP, ERP, CRM..." 
-                      className="border rounded p-2" 
-                      value={skill.name} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.managementSystems || [])];
-                        arr[idx] = { ...skill, name: e.target.value };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, managementSystems: arr } });
-                      }} 
-                    />
-                    <select 
-                      className="border rounded p-2" 
-                      value={skill.level} 
-                      onChange={(e) => {
-                        const arr = [...(cv.technicalSkills?.managementSystems || [])];
-                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
-                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, managementSystems: arr } });
-                      }}
-                    >
-                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
-                        <option key={level} value={level}>{level}</option>
-                      ))}
-                    </select>
-                    <button onClick={() => removeItem('technicalSkills.managementSystems', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                  </div>
-                ))}
-              </div>
+              <h3 className="text-md font-medium mb-3">Sistemas de Gestión</h3>
+              <TechnicalSkillSelector
+                category="managementSystems"
+                predefinedOptions={MANAGEMENT_SYSTEMS_OPTIONS}
+                selectedSkills={cv.technicalSkills?.managementSystems || []}
+                onSkillsChange={(skills) => {
+                  setCv({ 
+                    ...cv, 
+                    technicalSkills: { 
+                      ...cv.technicalSkills, 
+                      managementSystems: skills 
+                    } 
+                  });
+                }}
+                placeholder="Buscar sistemas de gestión (SAP, ERP, CRM...)"
+              />
             </div>
           </section>
 
@@ -688,6 +614,18 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                 </div>
               ))}
             </div>
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Conocimientos Complementarios</h2>
+            </div>
+            <TechnicalSkillSelector
+              category="Conocimientos Complementarios"
+              predefinedOptions={COMPLEMENTARY_KNOWLEDGE_OPTIONS}
+              selectedSkills={cv.complementaryKnowledge || []}
+              onSkillsChange={(skills) => setCv({ ...cv, complementaryKnowledge: skills })}
+            />
           </section>
 
           <section className="bg-white p-6 rounded-lg shadow">
