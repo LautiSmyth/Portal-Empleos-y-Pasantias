@@ -349,6 +349,131 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           </div>
 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Formación universitaria</h2>
+              <button onClick={() => addItem('universityEducation')} className="btn btn--action btn--sm">Agregar</button>
+            </div>
+            <div className="space-y-4">
+              {cv.universityEducation?.map((edu, idx) => (
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-7 gap-3 p-4 border rounded">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Carrera</label>
+                    <select 
+                      className="w-full border rounded p-2" 
+                      value={edu.career} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, career: e.target.value as UniversityCareer };
+                        setCv({ ...cv, universityEducation: arr });
+                      }}
+                    >
+                      {Object.values(UniversityCareer).map((career) => (
+                        <option key={career} value={career}>{career}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Universidad</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      list="universities"
+                      value={edu.university} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, university: e.target.value };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                    <datalist id="universities">
+                      {argentineUniversities.map((uni, uniIdx) => (
+                        <option key={uniIdx} value={uni} />
+                      ))}
+                    </datalist>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Materias aprobadas</label>
+                    <input 
+                      type="number" 
+                      min="0" 
+                      className={`w-full border rounded p-2 ${edu.approvedSubjects > edu.totalSubjects ? 'border-red-500' : ''}`}
+                      value={edu.approvedSubjects} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, approvedSubjects: parseInt(e.target.value) || 0 };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Total materias</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      className="w-full border rounded p-2" 
+                      value={edu.totalSubjects} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, totalSubjects: parseInt(e.target.value) || 0 };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Año ingreso</label>
+                    <input 
+                      type="number" 
+                      min="1950" 
+                      max={new Date().getFullYear()} 
+                      className="w-full border rounded p-2" 
+                      value={edu.startYear} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, startYear: parseInt(e.target.value) || new Date().getFullYear() };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Año egreso</label>
+                    <input 
+                      type="number" 
+                      min="1950" 
+                      max={new Date().getFullYear()} 
+                      className="w-full border rounded p-2" 
+                      value={edu.graduationYear} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, graduationYear: parseInt(e.target.value) || new Date().getFullYear() };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button onClick={() => removeItem('universityEducation', idx)} className="btn btn--danger btn--sm w-full">Borrar</button>
+                  </div>
+                  {edu.approvedSubjects > edu.totalSubjects && (
+                    <div className="md:col-span-7">
+                      <p className="text-red-500 text-xs">Las materias aprobadas no pueden ser más que el total</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Características personales</h2>
+            </div>
+            <TechnicalSkillSelector
+              category="personal_characteristics"
+              predefinedOptions={COMPLEMENTARY_KNOWLEDGE_OPTIONS}
+              selectedSkills={cv.complementaryKnowledge || []}
+              onSkillsChange={(skills) => setCv({ ...cv, complementaryKnowledge: skills })}
+            />
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <h2 className="text-lg font-semibold mb-4">Conocimientos Técnicos</h2>
 
             <div className="grid grid-cols-2 md:grid-cols-1 gap-6">
@@ -555,131 +680,6 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                 </div>
               ))}
             </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Formación universitaria</h2>
-              <button onClick={() => addItem('universityEducation')} className="btn btn--action btn--sm">Agregar</button>
-            </div>
-            <div className="space-y-4">
-              {cv.universityEducation?.map((edu, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-7 gap-3 p-4 border rounded">
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Carrera</label>
-                    <select 
-                      className="w-full border rounded p-2" 
-                      value={edu.career} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, career: e.target.value as UniversityCareer };
-                        setCv({ ...cv, universityEducation: arr });
-                      }}
-                    >
-                      {Object.values(UniversityCareer).map((career) => (
-                        <option key={career} value={career}>{career}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Universidad</label>
-                    <input 
-                      className="w-full border rounded p-2" 
-                      list="universities"
-                      value={edu.university} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, university: e.target.value };
-                        setCv({ ...cv, universityEducation: arr });
-                      }} 
-                    />
-                    <datalist id="universities">
-                      {argentineUniversities.map((uni, uniIdx) => (
-                        <option key={uniIdx} value={uni} />
-                      ))}
-                    </datalist>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Materias aprobadas</label>
-                    <input 
-                      type="number" 
-                      min="0" 
-                      className={`w-full border rounded p-2 ${edu.approvedSubjects > edu.totalSubjects ? 'border-red-500' : ''}`}
-                      value={edu.approvedSubjects} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, approvedSubjects: parseInt(e.target.value) || 0 };
-                        setCv({ ...cv, universityEducation: arr });
-                      }} 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Total materias</label>
-                    <input 
-                      type="number" 
-                      min="1" 
-                      className="w-full border rounded p-2" 
-                      value={edu.totalSubjects} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, totalSubjects: parseInt(e.target.value) || 0 };
-                        setCv({ ...cv, universityEducation: arr });
-                      }} 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Año ingreso</label>
-                    <input 
-                      type="number" 
-                      min="1950" 
-                      max={new Date().getFullYear()} 
-                      className="w-full border rounded p-2" 
-                      value={edu.startYear} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, startYear: parseInt(e.target.value) || new Date().getFullYear() };
-                        setCv({ ...cv, universityEducation: arr });
-                      }} 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Año egreso</label>
-                    <input 
-                      type="number" 
-                      min="1950" 
-                      max={new Date().getFullYear()} 
-                      className="w-full border rounded p-2" 
-                      value={edu.graduationYear} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, graduationYear: parseInt(e.target.value) || new Date().getFullYear() };
-                        setCv({ ...cv, universityEducation: arr });
-                      }} 
-                    />
-                  </div>
-                  <div className="flex items-end">
-                    <button onClick={() => removeItem('universityEducation', idx)} className="btn btn--danger btn--sm w-full">Borrar</button>
-                  </div>
-                  {edu.approvedSubjects > edu.totalSubjects && (
-                    <div className="md:col-span-7">
-                      <p className="text-red-500 text-xs">Las materias aprobadas no pueden ser más que el total</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Características personales</h2>
-            </div>
-            <TechnicalSkillSelector
-              category="personal_characteristics"
-              predefinedOptions={COMPLEMENTARY_KNOWLEDGE_OPTIONS}
-              selectedSkills={cv.complementaryKnowledge || []}
-              onSkillsChange={(skills) => setCv({ ...cv, complementaryKnowledge: skills })}
-            />
           </section>
 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
