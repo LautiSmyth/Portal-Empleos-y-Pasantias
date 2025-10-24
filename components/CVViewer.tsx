@@ -14,7 +14,7 @@ interface CVViewerProps {
 }
 
 const SectionTitle: React.FC<{ title: string }> = ({ title }) => (
-  <h2 className="section-title font-semibold">{title}</h2>
+  <h2 className="section-title">{title}</h2>
 );
 
 const stripParens = (s: string) => s.replace(/\s*\([^)]*\)\s*/g, '').trim();
@@ -81,36 +81,6 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
         </div>
       </div>
 
-      {/* University Education */}
-      {cv.universityEducation && cv.universityEducation.length > 0 && (
-        <div className="card">
-          <SectionTitle title="Formación universitaria" />
-          <ul className="list-disc pl-6 space-y-1">
-            {cv.universityEducation.map((edu, idx) => (
-              <li key={idx} className="text-gray-700">
-                <span className="font-medium">{edu.career}</span> — {edu.university} — Materias: {edu.approvedSubjects}/{edu.totalSubjects} — Ingreso: {edu.startYear} — Egreso: {edu.graduationYear}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Complementary Knowledge */}
-      {cv.complementaryKnowledge && cv.complementaryKnowledge.length > 0 && (
-        <div className="card">
-          <SectionTitle title="Características personales" />
-          <ul className="list-disc pl-6 space-y-1">
-            {cv.complementaryKnowledge.map((knowledge, idx) => (
-              <li key={idx} className="text-gray-700">
-                {stripParens(knowledge.name)} — {knowledge.level}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-
-
       {/* Experience */}
       <div className="card">
         <SectionTitle title="Experiencia laboral" />
@@ -148,68 +118,111 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
         </div>
       </div>
 
+      {/* University Education */}
+      {cv.universityEducation && cv.universityEducation.length > 0 && (
+        <div className="card">
+          <SectionTitle title="Formación universitaria" />
+          <div className="space-y-3">
+            {cv.universityEducation.map((edu, idx) => (
+              <div key={idx} className="space-y-1">
+                <div className="font-medium">{edu.career}</div>
+                <div className="text-gray-700">{edu.university}</div>
+
+                <div className="text-gray-600 text-sm">
+                  Materias: {edu.approvedSubjects}/{edu.totalSubjects} | Año de ingreso: {edu.startYear} | Año de egreso: {edu.graduationYear}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Complementary Knowledge */}
+      {cv.complementaryKnowledge && cv.complementaryKnowledge.length > 0 && (
+        <div className="card">
+          <SectionTitle title="Características personales" />
+          <div className="flex flex-wrap gap-2">
+            {cv.complementaryKnowledge.map((knowledge, idx) => (
+              <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+                {stripParens(knowledge.name)} (nivel {knowledge.level})
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Technical Skills */}
       {cv.technicalSkills && (
         <div className="card">
-          <SectionTitle title="Conocimientos Técnicos" />
-
+          <SectionTitle title="Conocimientos técnicos" />
+          
           {/* Office Skills */}
           {cv.technicalSkills.office && cv.technicalSkills.office.length > 0 && (
-            <div className="mb-3">
-              <h3 className="text-gray-800 font-medium mb-1">Software de Ofimática</h3>
-              <ul className="list-disc pl-6 space-y-1">
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Software de Ofimática</h3>
+              <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.office.map((skill, idx) => (
-                  <li key={idx} className="text-gray-700">{stripParens(skill.name)} — {skill.level}</li>
+                  <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+                    {skill.name} ({skill.level})
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {/* Language Skills */}
           {cv.technicalSkills.languages && cv.technicalSkills.languages.length > 0 && (
-            <div className="mb-3">
-              <h3 className="text-gray-800 font-medium mb-1">Idiomas</h3>
-              <ul className="list-disc pl-6 space-y-1">
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Idiomas</h3>
+              <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.languages.map((lang, idx) => (
-                  <li key={idx} className="text-gray-700">{stripParens(lang.language)} — {lang.level}</li>
+                  <span key={idx} className="inline-block bg-green-100 text-green-800 text-sm px-2 py-1 rounded">
+                    {lang.language} ({lang.level})
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {/* Design Skills */}
           {cv.technicalSkills.design && cv.technicalSkills.design.length > 0 && (
-            <div className="mb-3">
-              <h3 className="text-gray-800 font-medium mb-1">Software de Diseño</h3>
-              <ul className="list-disc pl-6 space-y-1">
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Software de Diseño</h3>
+              <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.design.map((skill, idx) => (
-                  <li key={idx} className="text-gray-700">{stripParens(skill.name)} — {skill.level}</li>
+                  <span key={idx} className="inline-block bg-purple-100 text-purple-800 text-sm px-2 py-1 rounded">
+                    {stripParens(skill.name)} ({skill.level})
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {/* Programming Skills */}
           {cv.technicalSkills.programming && cv.technicalSkills.programming.length > 0 && (
-            <div className="mb-3">
-              <h3 className="text-gray-800 font-medium mb-1">Programación y Mecatrónica</h3>
-              <ul className="list-disc pl-6 space-y-1">
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Programación y Mecatrónica</h3>
+              <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.programming.map((skill, idx) => (
-                  <li key={idx} className="text-gray-700">{stripParens(skill.name)} — {skill.level}</li>
+                  <span key={idx} className="inline-block bg-red-100 text-red-800 text-sm px-2 py-1 rounded">
+                    {stripParens(skill.name)} ({skill.level})
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
 
           {/* Management Systems */}
           {cv.technicalSkills.managementSystems && cv.technicalSkills.managementSystems.length > 0 && (
-            <div className="mb-3">
-              <h3 className="text-gray-800 font-medium mb-1">Sistemas de Gestión</h3>
-              <ul className="list-disc pl-6 space-y-1">
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Sistemas de Gestión</h3>
+              <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.managementSystems.map((skill, idx) => (
-                  <li key={idx} className="text-gray-700">{stripParens(skill.name)} — {skill.level}</li>
+                  <span key={idx} className="inline-block bg-yellow-100 text-yellow-800 text-sm px-2 py-1 rounded">
+                    {stripParens(skill.name)} ({skill.level})
+                  </span>
                 ))}
-              </ul>
+              </div>
             </div>
           )}
         </div>
@@ -218,18 +231,24 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
       {/* Training Courses */}
       {cv.trainingCourses && cv.trainingCourses.length > 0 && (
         <div className="card">
-          <SectionTitle title="Cursos de Capacitación" />
-          <ul className="list-disc pl-6 space-y-1">
+          <SectionTitle title="Cursos de capacitación" />
+          <div className="space-y-3">
             {cv.trainingCourses.map((course, idx) => (
-              <li key={idx} className="text-gray-700">
-                <span className="font-medium">{course.name}</span> — {course.institution}, {course.year}, {course.duration} h{course.certified ? ' — Certificado' : ''}{course.description ? ` — ${course.description}` : ''}
-              </li>
+              <div key={idx} className="space-y-1 border-b border-gray-200 pb-3 last:border-b-0">
+                <div className="font-medium">{course.name}</div>
+                <div className="text-gray-700 text-sm">{course.institution}</div>
+                <div className="text-gray-600 text-sm">
+                  {course.duration} horas | {course.year} 
+                  {course.certified && <span className="ml-2 text-green-600">✓ Certificado</span>}
+                </div>
+                {course.description && (
+                  <div className="text-gray-700 text-sm">{course.description}</div>
+                )}
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
-
-      {/* Características personales movidas cerca de Formación universitaria */}
 
       {/* Skills */}
       <div className="card">
