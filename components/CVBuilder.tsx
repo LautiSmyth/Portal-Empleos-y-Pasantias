@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CV } from '../types';
+import { CV, UniversityCareer, SkillLevel } from '../types';
 import { fetchCVByOwnerId, saveCV } from '../services/cvService';
 
 type CVBuilderProps = {
@@ -54,14 +54,23 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
         } catch {
           setCv({
             ownerId,
-            personal: { firstName: '', lastName: '', email: defaultEmail, phone: '' },
+            personal: { firstName: '', lastName: '', email: defaultEmail, phone: '', birthDate: '', locality: '' },
             links: {},
             education: [],
+            universityEducation: [],
             experience: [],
             projects: [],
             skills: [],
             softSkills: [],
             languages: [],
+            technicalSkills: {
+              office: [],
+              languages: [],
+              design: [],
+              programming: [],
+              managementSystems: []
+            },
+            trainingCourses: [],
           });
         }
       }
@@ -84,27 +93,97 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
     setCv(next);
   };
 
-  const addItem = (key: keyof CV) => {
+  const addItem = (key: keyof CV | string) => {
     if (!cv) return;
     const next = { ...cv } as any;
     const defaults: any = {
-      education: { institution: '', degree: '', start: '', end: '' },
-      experience: { company: '', role: '', responsibilities: '', start: '', end: '' },
-      projects: { title: '', description: '', technologies: [], link: '' },
-      skills: { name: '', level: 3 },
-      softSkills: '',
-      languages: { name: '', written: 'Intermedio', spoken: 'Intermedio' },
-    };
-    next[key] = [...(next[key] || []), defaults[key]];
+        education: { institution: '', degree: '', start: '', end: '' },
+        universityEducation: { 
+          career: UniversityCareer.INGENIERIA_INDUSTRIAL, 
+          university: '', 
+          city: '', 
+          province: '', 
+          approvedSubjects: 0, 
+          totalSubjects: 0, 
+          startYear: new Date().getFullYear() 
+        },
+        experience: { company: '', role: '', responsibilities: '', start: '', end: '' },
+        projects: { title: '', description: '', technologies: [], link: '' },
+        skills: { name: '', level: 3 },
+        softSkills: '',
+        languages: { name: '', written: 'Intermedio', spoken: 'Intermedio' },
+        'technicalSkills.office': { name: '', level: SkillLevel.BASICO },
+        'technicalSkills.languages': { language: '', level: SkillLevel.BASICO },
+        'technicalSkills.design': { name: '', level: SkillLevel.BASICO },
+        'technicalSkills.programming': { name: '', level: SkillLevel.BASICO },
+        'technicalSkills.managementSystems': { name: '', level: SkillLevel.BASICO },
+        trainingCourses: { 
+          name: '', 
+          institution: '', 
+          duration: 0, 
+          year: new Date().getFullYear(), 
+          certified: false, 
+          description: '' 
+        },
+      };
+    
+    if (key.includes('.')) {
+      const [parent, child] = key.split('.');
+      if (!next[parent]) next[parent] = {};
+      if (!next[parent][child]) next[parent][child] = [];
+      next[parent][child] = [...next[parent][child], defaults[key]];
+    } else {
+      next[key] = [...(next[key] || []), defaults[key]];
+    }
     setCv(next);
   };
 
-  const removeItem = (key: keyof CV, idx: number) => {
+  const removeItem = (key: keyof CV | string, idx: number) => {
     if (!cv) return;
     const next = { ...cv } as any;
-    next[key] = next[key].filter((_: any, i: number) => i !== idx);
+    
+    if (key.includes('.')) {
+      const [parent, child] = key.split('.');
+      next[parent][child] = next[parent][child].filter((_: any, i: number) => i !== idx);
+    } else {
+      next[key] = next[key].filter((_: any, i: number) => i !== idx);
+    }
     setCv(next);
   };
+
+  // Función para validar fecha DD/MM/YYYY
+  const validateDate = (date: string): boolean => {
+    const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = date.match(regex);
+    if (!match) return false;
+    
+    const day = parseInt(match[1]);
+    const month = parseInt(match[2]);
+    const year = parseInt(match[3]);
+    
+    if (month < 1 || month > 12) return false;
+    if (day < 1 || day > 31) return false;
+    if (year < 1900 || year > new Date().getFullYear()) return false;
+    
+    return true;
+  };
+
+  // Lista de localidades argentinas (muestra)
+  const argentineLocalities = [
+    'Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata', 'San Miguel de Tucumán',
+    'Mar del Plata', 'Salta', 'Santa Fe', 'San Juan', 'Resistencia', 'Neuquén',
+    'Santiago del Estero', 'Corrientes', 'Posadas', 'Bahía Blanca', 'Paraná',
+    'Formosa', 'San Luis', 'La Rioja', 'Catamarca', 'Río Gallegos', 'Ushuaia'
+  ];
+
+  // Lista de universidades argentinas (muestra)
+  const argentineUniversities = [
+    'Universidad de Buenos Aires (UBA)', 'Universidad Nacional de Córdoba (UNC)',
+    'Universidad Nacional de La Plata (UNLP)', 'Universidad Tecnológica Nacional (UTN)',
+    'Universidad Nacional de Rosario (UNR)', 'Universidad Nacional de Cuyo (UNCuyo)',
+    'Universidad Nacional del Litoral (UNL)', 'Universidad Nacional de Tucumán (UNT)',
+    'Universidad Nacional del Sur (UNS)', 'Universidad Nacional de Mar del Plata (UNMdP)'
+  ];
 
   const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setError(null);
@@ -169,6 +248,445 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                 <label className="block text-sm">Teléfono</label>
                 <input className="w-full border rounded p-2" value={cv.personal.phone} onChange={(e) => update('personal.phone', e.target.value)} />
               </div>
+              <div>
+                <label className="block text-sm">Fecha de nacimiento (DD/MM/YYYY)</label>
+                <input 
+                  className={`w-full border rounded p-2 ${cv.personal.birthDate && !validateDate(cv.personal.birthDate || '') ? 'border-red-500' : ''}`}
+                  placeholder="DD/MM/YYYY"
+                  value={cv.personal.birthDate || ''} 
+                  onChange={(e) => update('personal.birthDate', e.target.value)} 
+                />
+                {cv.personal.birthDate && !validateDate(cv.personal.birthDate) && (
+                  <p className="text-red-500 text-xs mt-1">Formato inválido. Use DD/MM/YYYY</p>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm">Localidad</label>
+                <input 
+                  className="w-full border rounded p-2" 
+                  list="localities"
+                  value={cv.personal.locality || ''} 
+                  onChange={(e) => update('personal.locality', e.target.value)} 
+                />
+                <datalist id="localities">
+                  {argentineLocalities.map((locality, idx) => (
+                    <option key={idx} value={locality} />
+                  ))}
+                </datalist>
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <h2 className="text-lg font-semibold mb-4">Conocimientos Técnicos</h2>
+            
+            {/* Conocimientos de Ofimática */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-md font-medium">Software de Ofimática</h3>
+                <button onClick={() => addItem('technicalSkills.office')} className="btn btn--action btn--sm">Agregar</button>
+              </div>
+              <div className="space-y-2">
+                {cv.technicalSkills?.office?.map((skill, idx) => (
+                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
+                    <input 
+                      placeholder="Word, Excel, PowerPoint..." 
+                      className="border rounded p-2" 
+                      value={skill.name} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.office || [])];
+                        arr[idx] = { ...skill, name: e.target.value };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, office: arr } });
+                      }} 
+                    />
+                    <select 
+                      className="border rounded p-2" 
+                      value={skill.level} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.office || [])];
+                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, office: arr } });
+                      }}
+                    >
+                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
+                        <option key={level} value={level}>{level}</option>
+                      ))}
+                    </select>
+                    <button onClick={() => removeItem('technicalSkills.office', idx)} className="btn btn--danger btn--sm">Borrar</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Conocimientos de Idiomas */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-md font-medium">Idiomas</h3>
+                <button onClick={() => addItem('technicalSkills.languages')} className="btn btn--action btn--sm">Agregar</button>
+              </div>
+              <div className="space-y-2">
+                {cv.technicalSkills?.languages?.map((lang, idx) => (
+                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
+                    <input 
+                      placeholder="Inglés, Francés, Alemán..." 
+                      className="border rounded p-2" 
+                      value={lang.language} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.languages || [])];
+                        arr[idx] = { ...lang, language: e.target.value };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, languages: arr } });
+                      }} 
+                    />
+                    <select 
+                      className="border rounded p-2" 
+                      value={lang.level} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.languages || [])];
+                        arr[idx] = { ...lang, level: e.target.value as SkillLevel };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, languages: arr } });
+                      }}
+                    >
+                      {Object.values(SkillLevel).map((level) => (
+                        <option key={level} value={level}>{level}</option>
+                      ))}
+                    </select>
+                    <button onClick={() => removeItem('technicalSkills.languages', idx)} className="btn btn--danger btn--sm">Borrar</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Conocimientos de Diseño */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-md font-medium">Software de Diseño</h3>
+                <button onClick={() => addItem('technicalSkills.design')} className="btn btn--action btn--sm">Agregar</button>
+              </div>
+              <div className="space-y-2">
+                {cv.technicalSkills?.design?.map((skill, idx) => (
+                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
+                    <input 
+                      placeholder="Photoshop, Illustrator, AutoCAD..." 
+                      className="border rounded p-2" 
+                      value={skill.name} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.design || [])];
+                        arr[idx] = { ...skill, name: e.target.value };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, design: arr } });
+                      }} 
+                    />
+                    <select 
+                      className="border rounded p-2" 
+                      value={skill.level} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.design || [])];
+                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, design: arr } });
+                      }}
+                    >
+                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
+                        <option key={level} value={level}>{level}</option>
+                      ))}
+                    </select>
+                    <button onClick={() => removeItem('technicalSkills.design', idx)} className="btn btn--danger btn--sm">Borrar</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Conocimientos de Programación y Mecatrónica */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-md font-medium">Programación y Mecatrónica</h3>
+                <button onClick={() => addItem('technicalSkills.programming')} className="btn btn--action btn--sm">Agregar</button>
+              </div>
+              <div className="space-y-2">
+                {cv.technicalSkills?.programming?.map((skill, idx) => (
+                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
+                    <input 
+                      placeholder="Python, PLC, MATLAB, CAD..." 
+                      className="border rounded p-2" 
+                      value={skill.name} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.programming || [])];
+                        arr[idx] = { ...skill, name: e.target.value };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, programming: arr } });
+                      }} 
+                    />
+                    <select 
+                      className="border rounded p-2" 
+                      value={skill.level} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.programming || [])];
+                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, programming: arr } });
+                      }}
+                    >
+                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
+                        <option key={level} value={level}>{level}</option>
+                      ))}
+                    </select>
+                    <button onClick={() => removeItem('technicalSkills.programming', idx)} className="btn btn--danger btn--sm">Borrar</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Sistemas de Gestión */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-md font-medium">Sistemas de Gestión</h3>
+                <button onClick={() => addItem('technicalSkills.managementSystems')} className="btn btn--action btn--sm">Agregar</button>
+              </div>
+              <div className="space-y-2">
+                {cv.technicalSkills?.managementSystems?.map((skill, idx) => (
+                  <div key={idx} className="grid grid-cols-3 gap-3 items-center">
+                    <input 
+                      placeholder="SAP, ERP, CRM..." 
+                      className="border rounded p-2" 
+                      value={skill.name} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.managementSystems || [])];
+                        arr[idx] = { ...skill, name: e.target.value };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, managementSystems: arr } });
+                      }} 
+                    />
+                    <select 
+                      className="border rounded p-2" 
+                      value={skill.level} 
+                      onChange={(e) => {
+                        const arr = [...(cv.technicalSkills?.managementSystems || [])];
+                        arr[idx] = { ...skill, level: e.target.value as SkillLevel };
+                        setCv({ ...cv, technicalSkills: { ...cv.technicalSkills, managementSystems: arr } });
+                      }}
+                    >
+                      {Object.values(SkillLevel).filter(level => level !== SkillLevel.NATIVO).map((level) => (
+                        <option key={level} value={level}>{level}</option>
+                      ))}
+                    </select>
+                    <button onClick={() => removeItem('technicalSkills.managementSystems', idx)} className="btn btn--danger btn--sm">Borrar</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Cursos de Capacitación</h2>
+              <button onClick={() => addItem('trainingCourses')} className="btn btn--action btn--sm">Agregar</button>
+            </div>
+            <div className="space-y-4">
+              {cv.trainingCourses?.map((course, idx) => (
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-3 p-4 border rounded">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Nombre del curso</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      value={course.name} 
+                      onChange={(e) => {
+                        const arr = [...(cv.trainingCourses || [])];
+                        arr[idx] = { ...course, name: e.target.value };
+                        setCv({ ...cv, trainingCourses: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Institución</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      value={course.institution} 
+                      onChange={(e) => {
+                        const arr = [...(cv.trainingCourses || [])];
+                        arr[idx] = { ...course, institution: e.target.value };
+                        setCv({ ...cv, trainingCourses: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Duración (horas)</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      className="w-full border rounded p-2" 
+                      value={course.duration} 
+                      onChange={(e) => {
+                        const arr = [...(cv.trainingCourses || [])];
+                        arr[idx] = { ...course, duration: parseInt(e.target.value) || 0 };
+                        setCv({ ...cv, trainingCourses: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Año</label>
+                    <input 
+                      type="number" 
+                      min="1950" 
+                      max={new Date().getFullYear()} 
+                      className="w-full border rounded p-2" 
+                      value={course.year} 
+                      onChange={(e) => {
+                        const arr = [...(cv.trainingCourses || [])];
+                        arr[idx] = { ...course, year: parseInt(e.target.value) || new Date().getFullYear() };
+                        setCv({ ...cv, trainingCourses: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Certificado</label>
+                    <div className="flex items-center space-x-2 mt-2">
+                      <input 
+                        type="checkbox" 
+                        checked={course.certified} 
+                        onChange={(e) => {
+                          const arr = [...(cv.trainingCourses || [])];
+                          arr[idx] = { ...course, certified: e.target.checked };
+                          setCv({ ...cv, trainingCourses: arr });
+                        }} 
+                      />
+                      <span className="text-sm">Sí</span>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Descripción</label>
+                    <textarea 
+                      className="w-full border rounded p-2" 
+                      rows={2}
+                      value={course.description} 
+                      onChange={(e) => {
+                        const arr = [...(cv.trainingCourses || [])];
+                        arr[idx] = { ...course, description: e.target.value };
+                        setCv({ ...cv, trainingCourses: arr });
+                      }} 
+                    />
+                  </div>
+                  <div className="md:col-span-6 flex justify-end">
+                    <button onClick={() => removeItem('trainingCourses', idx)} className="btn btn--danger btn--sm">Borrar curso</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Formación universitaria</h2>
+              <button onClick={() => addItem('universityEducation')} className="btn btn--action btn--sm">Agregar</button>
+            </div>
+            <div className="space-y-4">
+              {cv.universityEducation?.map((edu, idx) => (
+                <div key={idx} className="grid grid-cols-1 md:grid-cols-7 gap-3 p-4 border rounded">
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Carrera</label>
+                    <select 
+                      className="w-full border rounded p-2" 
+                      value={edu.career} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, career: e.target.value as UniversityCareer };
+                        setCv({ ...cv, universityEducation: arr });
+                      }}
+                    >
+                      {Object.values(UniversityCareer).map((career) => (
+                        <option key={career} value={career}>{career}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Universidad</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      list="universities"
+                      value={edu.university} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, university: e.target.value };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                    <datalist id="universities">
+                      {argentineUniversities.map((uni, uniIdx) => (
+                        <option key={uniIdx} value={uni} />
+                      ))}
+                    </datalist>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Ciudad</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      value={edu.city} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, city: e.target.value };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Provincia</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      value={edu.province} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, province: e.target.value };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Materias aprobadas</label>
+                    <input 
+                      type="number" 
+                      min="0" 
+                      className={`w-full border rounded p-2 ${edu.approvedSubjects > edu.totalSubjects ? 'border-red-500' : ''}`}
+                      value={edu.approvedSubjects} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, approvedSubjects: parseInt(e.target.value) || 0 };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Total materias</label>
+                    <input 
+                      type="number" 
+                      min="1" 
+                      className="w-full border rounded p-2" 
+                      value={edu.totalSubjects} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, totalSubjects: parseInt(e.target.value) || 0 };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Año ingreso</label>
+                    <input 
+                      type="number" 
+                      min="1950" 
+                      max={new Date().getFullYear()} 
+                      className="w-full border rounded p-2" 
+                      value={edu.startYear} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, startYear: parseInt(e.target.value) || new Date().getFullYear() };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button onClick={() => removeItem('universityEducation', idx)} className="btn btn--danger btn--sm w-full">Borrar</button>
+                  </div>
+                  {edu.approvedSubjects > edu.totalSubjects && (
+                    <div className="md:col-span-7">
+                      <p className="text-red-500 text-xs">Las materias aprobadas no pueden ser más que el total</p>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </section>
 

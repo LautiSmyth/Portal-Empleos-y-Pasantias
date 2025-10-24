@@ -1,5 +1,5 @@
 import React from 'react';
-import { CV } from '../types';
+import { CV, SkillLevel } from '../types';
 
 /**
  * CVViewer
@@ -36,6 +36,18 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
             <div className="text-sm text-gray-600">Teléfono</div>
             <div className="font-medium">{cv.personal.phone}</div>
           </div>
+          {cv.personal.birthDate && (
+            <div>
+              <div className="text-sm text-gray-600">Fecha de nacimiento</div>
+              <div className="font-medium">{cv.personal.birthDate}</div>
+            </div>
+          )}
+          {cv.personal.locality && (
+            <div>
+              <div className="text-sm text-gray-600">Localidad</div>
+              <div className="font-medium">{cv.personal.locality}</div>
+            </div>
+          )}
         </div>
       </div>
 
@@ -48,6 +60,25 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
           {cv.links?.portfolio && <div><span className="text-sm text-gray-600">Portafolio: </span><a href={cv.links.portfolio} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{cv.links.portfolio}</a></div>}
         </div>
       </div>
+
+      {/* University Education */}
+      {cv.universityEducation && cv.universityEducation.length > 0 && (
+        <div className="card">
+          <SectionTitle title="Formación universitaria" />
+          <div className="space-y-3">
+            {cv.universityEducation.map((edu, idx) => (
+              <div key={idx} className="space-y-1">
+                <div className="font-medium">{edu.career}</div>
+                <div className="text-gray-700">{edu.university}</div>
+                <div className="text-gray-600 text-sm">{edu.city}, {edu.province}</div>
+                <div className="text-gray-600 text-sm">
+                  Materias: {edu.approvedSubjects}/{edu.totalSubjects} | Año de ingreso: {edu.startYear}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Education */}
       <div className="card">
@@ -102,6 +133,105 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
           )}
         </div>
       </div>
+
+      {/* Technical Skills */}
+      {cv.technicalSkills && (
+        <div className="card">
+          <SectionTitle title="Conocimientos técnicos" />
+          
+          {/* Office Skills */}
+          {cv.technicalSkills.office && cv.technicalSkills.office.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Software de Ofimática</h3>
+              <div className="flex flex-wrap gap-2">
+                {cv.technicalSkills.office.map((skill, idx) => (
+                  <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+                    {skill.name} ({skill.level})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Language Skills */}
+          {cv.technicalSkills.languages && cv.technicalSkills.languages.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Idiomas</h3>
+              <div className="flex flex-wrap gap-2">
+                {cv.technicalSkills.languages.map((lang, idx) => (
+                  <span key={idx} className="inline-block bg-green-100 text-green-800 text-sm px-2 py-1 rounded">
+                    {lang.language} ({lang.level})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Design Skills */}
+          {cv.technicalSkills.design && cv.technicalSkills.design.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Software de Diseño</h3>
+              <div className="flex flex-wrap gap-2">
+                {cv.technicalSkills.design.map((skill, idx) => (
+                  <span key={idx} className="inline-block bg-purple-100 text-purple-800 text-sm px-2 py-1 rounded">
+                    {skill.name} ({skill.level})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Programming Skills */}
+          {cv.technicalSkills.programming && cv.technicalSkills.programming.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Programación y Mecatrónica</h3>
+              <div className="flex flex-wrap gap-2">
+                {cv.technicalSkills.programming.map((skill, idx) => (
+                  <span key={idx} className="inline-block bg-red-100 text-red-800 text-sm px-2 py-1 rounded">
+                    {skill.name} ({skill.level})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Management Systems */}
+          {cv.technicalSkills.managementSystems && cv.technicalSkills.managementSystems.length > 0 && (
+            <div className="mb-4">
+              <h3 className="font-medium text-gray-800 mb-2">Sistemas de Gestión</h3>
+              <div className="flex flex-wrap gap-2">
+                {cv.technicalSkills.managementSystems.map((skill, idx) => (
+                  <span key={idx} className="inline-block bg-yellow-100 text-yellow-800 text-sm px-2 py-1 rounded">
+                    {skill.name} ({skill.level})
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Training Courses */}
+      {cv.trainingCourses && cv.trainingCourses.length > 0 && (
+        <div className="card">
+          <SectionTitle title="Cursos de capacitación" />
+          <div className="space-y-3">
+            {cv.trainingCourses.map((course, idx) => (
+              <div key={idx} className="space-y-1 border-b border-gray-200 pb-3 last:border-b-0">
+                <div className="font-medium">{course.name}</div>
+                <div className="text-gray-700 text-sm">{course.institution}</div>
+                <div className="text-gray-600 text-sm">
+                  {course.duration} horas | {course.year} 
+                  {course.certified && <span className="ml-2 text-green-600">✓ Certificado</span>}
+                </div>
+                {course.description && (
+                  <div className="text-gray-700 text-sm">{course.description}</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Skills */}
       <div className="card">

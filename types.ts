@@ -70,22 +70,88 @@ export enum ExperienceLevel {
   SENIOR = 'senior',
 }
 
+export enum SkillLevel {
+  BASICO = 'Básico',
+  MEDIO = 'Medio',
+  AVANZADO = 'Avanzado',
+  NATIVO = 'Nativo'
+}
+
+export enum UniversityCareer {
+  INGENIERIA_INDUSTRIAL = 'Ingeniería Industrial',
+  INGENIERIA_MECANICA = 'Ingeniería Mecánica',
+  INGENIERIA_MECATRONICA = 'Ingeniería Mecatrónica',
+  INGENIERIA_FERROVIARIA = 'Ingeniería Ferroviaria',
+  LICENCIATURA_HIGIENE_SEGURIDAD = 'Licenciatura en Higiene y Seguridad'
+}
+
 export type Skill = { name: string; level: number };
 export type LanguageSkill = { name: string; written: string; spoken: string };
 export type Education = { institution: string; degree: string; start: string; end: string };
 export type WorkExperience = { company: string; role: string; responsibilities: string; start: string; end: string };
 export type Project = { title: string; description: string; technologies: string[]; link?: string };
 
+// Nuevos tipos para las mejoras del CV
+export type UniversityEducation = {
+  career: UniversityCareer;
+  university: string;
+  city: string;
+  province: string;
+  approvedSubjects: number;
+  totalSubjects: number;
+  startYear: number;
+};
+
+export type TechnicalSkill = {
+  name: string;
+  level: SkillLevel;
+};
+
+export type OfficeSkill = TechnicalSkill;
+export type LanguageSkillNew = {
+  language: string;
+  level: SkillLevel;
+};
+export type DesignSkill = TechnicalSkill;
+export type ProgrammingSkill = TechnicalSkill;
+export type ManagementSystemSkill = TechnicalSkill;
+
+export type TrainingCourse = {
+  name: string;
+  institution: string;
+  duration: number; // en horas
+  year: number;
+  certified: boolean;
+  description: string;
+};
+
 export interface CV {
   ownerId: string;
-  personal: { firstName: string; lastName: string; email: string; phone: string };
+  personal: { 
+    firstName: string; 
+    lastName: string; 
+    email: string; 
+    phone: string;
+    birthDate?: string; // formato DD/MM/YYYY
+    locality?: string;
+  };
   links: { linkedin?: string; github?: string; portfolio?: string };
   education: Education[];
+  universityEducation: UniversityEducation[];
   experience: WorkExperience[];
   projects: Project[];
   skills: Skill[];
   softSkills: string[];
   languages: LanguageSkill[];
+  // Nuevas secciones de conocimientos técnicos categorizados
+  technicalSkills: {
+    office: OfficeSkill[];
+    languages: LanguageSkillNew[];
+    design: DesignSkill[];
+    programming: ProgrammingSkill[];
+    managementSystems: ManagementSystemSkill[];
+  };
+  trainingCourses: TrainingCourse[];
   pdfFileName?: string;
   pdfDataUrl?: string;
 }

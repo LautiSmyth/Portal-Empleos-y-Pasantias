@@ -114,7 +114,10 @@ const App: React.FC = () => {
           .select('role, first_name, company_verified')
           .eq('id', user.id)
           .maybeSingle();
-        if (refreshedProfile) (profileData as any) = refreshedProfile;
+        if (refreshedProfile) {
+          // Actualizar profileData con los datos refrescados
+          Object.assign(profileData || {}, refreshedProfile);
+        }
       }
     } catch (_) {}
 
