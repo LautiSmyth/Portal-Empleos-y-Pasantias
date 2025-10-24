@@ -351,12 +351,13 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Formación universitaria</h2>
-              <button onClick={() => addItem('universityEducation')} className="btn btn--action btn--sm">Agregar</button>
+              <button onClick={() => addItem('universityEducation')} className="btn btn--primary btn--md">Agregar</button>
             </div>
             <div className="space-y-4">
               {cv.universityEducation?.map((edu, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-7 gap-3 p-4 border rounded">
-                  <div>
+                <div key={idx} className="relative grid grid-cols-1 md:grid-cols-8 gap-3 p-4 border rounded">
+                  <button onClick={() => removeItem('universityEducation', idx)} className="absolute top-2 right-2 btn btn--danger btn--sm rounded-full w-8 h-8 p-0" aria-label="Eliminar">−</button>
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium mb-1">Carrera</label>
                     <select 
                       className="w-full border rounded p-2" 
@@ -372,7 +373,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                       ))}
                     </select>
                   </div>
-                  <div>
+                  <div className="md:col-span-2">
                     <label className="block text-sm font-medium mb-1">Universidad</label>
                     <input 
                       className="w-full border rounded p-2" 
@@ -395,7 +396,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     <input 
                       type="number" 
                       min="0" 
-                      className={`w-full border rounded p-2 ${edu.approvedSubjects > edu.totalSubjects ? 'border-red-500' : ''}`}
+                      className={`w-20 border rounded p-2 text-center ${edu.approvedSubjects > edu.totalSubjects ? 'border-red-500' : ''}`}
                       value={edu.approvedSubjects} 
                       onChange={(e) => {
                         const arr = [...(cv.universityEducation || [])];
@@ -409,7 +410,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     <input 
                       type="number" 
                       min="1" 
-                      className="w-full border rounded p-2" 
+                      className="w-20 border rounded p-2 text-center" 
                       value={edu.totalSubjects} 
                       onChange={(e) => {
                         const arr = [...(cv.universityEducation || [])];
@@ -448,9 +449,6 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                       }} 
                     />
                   </div>
-                  <div className="flex items-end">
-                    <button onClick={() => removeItem('universityEducation', idx)} className="btn btn--danger btn--sm w-full">Borrar</button>
-                  </div>
                   {edu.approvedSubjects > edu.totalSubjects && (
                     <div className="md:col-span-7">
                       <p className="text-red-500 text-xs">Las materias aprobadas no pueden ser más que el total</p>
@@ -476,7 +474,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <h2 className="text-lg font-semibold mb-4">Conocimientos Técnicos</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Conocimientos de Ofimática */}
               <div>
                 <h3 className="text-md font-medium mb-3">Software de Ofimática</h3>
@@ -588,11 +586,12 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Cursos de Capacitación</h2>
-              <button onClick={() => addItem('trainingCourses')} className="btn btn--action btn--sm">Agregar</button>
+              <button onClick={() => addItem('trainingCourses')} className="btn btn--primary btn--md">Agregar</button>
             </div>
             <div className="space-y-4">
               {cv.trainingCourses?.map((course, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-3 p-4 border rounded">
+                <div key={idx} className="relative grid grid-cols-1 md:grid-cols-6 gap-3 p-4 border rounded">
+                  <button onClick={() => removeItem('trainingCourses', idx)} className="absolute top-2 right-2 btn btn--danger btn--sm rounded-full w-8 h-8 p-0" aria-label="Eliminar">−</button>
                   <div>
                     <label className="block text-sm font-medium mb-1">Nombre del curso</label>
                     <input 
@@ -661,11 +660,11 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                       <span className="text-sm">Sí</span>
                     </div>
                   </div>
-                  <div>
+                  <div className="md:col-span-6">
                     <label className="block text-sm font-medium mb-1">Descripción</label>
                     <textarea 
                       className="w-full border rounded p-2" 
-                      rows={2}
+                      rows={4}
                       value={course.description} 
                       onChange={(e) => {
                         const arr = [...(cv.trainingCourses || [])];
@@ -674,8 +673,114 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                       }} 
                     />
                   </div>
-                  <div className="md:col-span-6 flex justify-end">
-                    <button onClick={() => removeItem('trainingCourses', idx)} className="btn btn--danger btn--sm">Borrar curso</button>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Experiencia laboral</h2>
+              <button onClick={() => addItem('experience')} className="btn btn--primary btn--md">Agregar</button>
+            </div>
+            <div className="space-y-4">
+              {cv.experience?.map((ex, idx) => (
+                <div key={idx} className="relative grid grid-cols-1 md:grid-cols-6 gap-3 p-4 border rounded">
+                  <button onClick={() => removeItem('experience', idx)} className="absolute top-2 right-2 btn btn--danger btn--sm rounded-full w-8 h-8 p-0" aria-label="Eliminar">−</button>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1">Empresa</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      value={ex.company} 
+                      onChange={(e) => {
+                        const arr = [...(cv.experience || [])];
+                        arr[idx] = { ...ex, company: e.target.value };
+                        setCv({ ...cv, experience: arr });
+                      }} 
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-1">Puesto</label>
+                    <input 
+                      className="w-full border rounded p-2" 
+                      value={ex.role} 
+                      onChange={(e) => {
+                        const arr = [...(cv.experience || [])];
+                        arr[idx] = { ...ex, role: e.target.value };
+                        setCv({ ...cv, experience: arr });
+                      }} 
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Inicio</label>
+                    <input 
+                      className={`w-full border rounded p-2 ${ex.start && !/^(0[1-9]|1[0-2])\/\d{4}$/.test(ex.start) ? 'border-red-500' : ''}`}
+                      placeholder="MM/YYYY"
+                      inputMode="numeric"
+                      maxLength={7}
+                      value={ex.start}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        const digits = raw.replace(/[^0-9]/g, '');
+                        let mm = digits.slice(0, 2);
+                        let yyyy = digits.slice(2, 6);
+                        if (mm.length === 2) {
+                          let m = parseInt(mm, 10);
+                          if (isNaN(m) || m < 1) m = 1;
+                          if (m > 12) m = 12;
+                          mm = m < 10 ? '0' + m : String(m);
+                        }
+                        const formatted = yyyy ? mm + '/' + yyyy : mm;
+                        const arr = [...(cv.experience || [])];
+                        arr[idx] = { ...ex, start: formatted };
+                        setCv({ ...cv, experience: arr });
+                      }}
+                    />
+                    {ex.start && !/^(0[1-9]|1[0-2])\/\d{4}$/.test(ex.start) && (
+                      <p className="text-red-500 text-xs mt-1">Formato inválido. Use MM/YYYY</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Fin</label>
+                    <input 
+                      className={`w-full border rounded p-2 ${ex.end && !/^(0[1-9]|1[0-2])\/\d{4}$/.test(ex.end) ? 'border-red-500' : ''}`}
+                      placeholder="MM/YYYY"
+                      inputMode="numeric"
+                      maxLength={7}
+                      value={ex.end}
+                      onChange={(e) => {
+                        const raw = e.target.value;
+                        const digits = raw.replace(/[^0-9]/g, '');
+                        let mm = digits.slice(0, 2);
+                        let yyyy = digits.slice(2, 6);
+                        if (mm.length === 2) {
+                          let m = parseInt(mm, 10);
+                          if (isNaN(m) || m < 1) m = 1;
+                          if (m > 12) m = 12;
+                          mm = m < 10 ? '0' + m : String(m);
+                        }
+                        const formatted = yyyy ? mm + '/' + yyyy : mm;
+                        const arr = [...(cv.experience || [])];
+                        arr[idx] = { ...ex, end: formatted };
+                        setCv({ ...cv, experience: arr });
+                      }} 
+                    />
+                    {ex.end && !/^(0[1-9]|1[0-2])\/\d{4}$/.test(ex.end) && (
+                      <p className="text-red-500 text-xs mt-1">Formato inválido. Use MM/YYYY</p>
+                    )}
+                  </div>
+                  <div className="md:col-span-6">
+                    <label className="block text-sm font-medium mb-1">Responsabilidades</label>
+                    <textarea 
+                      className="w-full border rounded p-2" 
+                      rows={4}
+                      value={ex.responsibilities} 
+                      onChange={(e) => {
+                        const arr = [...(cv.experience || [])];
+                        arr[idx] = { ...ex, responsibilities: e.target.value };
+                        setCv({ ...cv, experience: arr });
+                      }} 
+                    />
                   </div>
                 </div>
               ))}

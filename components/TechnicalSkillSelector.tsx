@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { SkillLevel } from '../types';
 
+
 interface TechnicalSkillSelectorProps {
   category: string;
   predefinedOptions: string[];
@@ -297,13 +298,13 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
             Conocimientos seleccionados:
           </label>
           {selectedSkills.map((skill, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-md min-h-[44px]">
-              <span className="text-sm">{stripParens(skill.name)}</span>
+            <div key={index} className="grid grid-cols-12 items-center gap-2 p-1">
+              <span className="col-span-7 md:col-span-8 text-sm truncate">{stripParens(skill.name)}</span>
               <select
                 aria-label={`Nivel para ${stripParens(skill.name)}`}
                 value={skill.level}
                 onChange={(e) => updateSkillLevel(skill.name, e.target.value as SkillLevel)}
-                className="text-sm border border-gray-300 rounded-md px-3 py-2 h-9"
+                className="col-span-4 md:col-span-3 text-sm border border-gray-300 rounded-md px-3 py-2 h-9"
               >
                 <option value={SkillLevel.BASICO}>Básico</option>
                 <option value={SkillLevel.MEDIO}>Medio</option>
@@ -312,15 +313,17 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
                   <option value={SkillLevel.NATIVO}>Nativo</option>
                 )}
               </select>
-              <button
-                type="button"
-                onClick={() => removeSkill(skill.name)}
-                aria-label={`Eliminar ${stripParens(skill.name)}`}
-                title="Eliminar"
-                className="ml-2 text-red-600 hover:text-red-700 text-xl p-1 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
-              >
-                ✕
-              </button>
+              <div className="col-span-1 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => removeSkill(skill.name)}
+                  aria-label={`Eliminar ${stripParens(skill.name)}`}
+                  title="Eliminar"
+                  className="btn btn--danger btn--sm rounded-full w-8 h-8 p-0"
+                >
+                  −
+                </button>
+              </div>
             </div>
           ))}
         </div>
