@@ -629,7 +629,7 @@ function PasswordResetForm() {
         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="mt-1 w-full border rounded p-2" placeholder="usuario@dominio.com" />
       </div>
       <div className="md:col-span-2 flex items-center gap-3">
-        <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded disabled:opacity-50" disabled={submitting}>
+        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" disabled={submitting}>
           {submitting ? 'Enviando...' : 'Enviar reset password'}
         </button>
         {message && <span className="text-sm text-gray-700">{message}</span>}

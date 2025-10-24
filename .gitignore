@@ -6,6 +6,13 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+# HTTP/network traces and HAR dumps
+*.har
+*.har.json
+*.http
+*.trace
+*.trace.json
+har_logs/
 
 node_modules
 dist
