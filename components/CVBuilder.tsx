@@ -56,8 +56,6 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
             education: [],
             experience: [],
             projects: [],
-            skills: [],
-            softSkills: [],
             languages: [],
           });
         } catch {
@@ -69,8 +67,6 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
             universityEducation: [],
             experience: [],
             projects: [],
-            skills: [],
-            softSkills: [],
             languages: [],
             technicalSkills: {
               office: [],
@@ -119,8 +115,6 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
         },
         experience: { company: '', role: '', responsibilities: '', start: '', end: '' },
         projects: { title: '', description: '', technologies: [], link: '' },
-        skills: { name: '', level: 3 },
-        softSkills: '',
         languages: { name: '', written: 'Intermedio', spoken: 'Intermedio' },
         'technicalSkills.office': { name: '', level: SkillLevel.BASICO },
         'technicalSkills.languages': { language: '', level: SkillLevel.BASICO },
@@ -739,48 +733,6 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     setCv({ ...cv, projects: arr });
                   }} />
                   <button onClick={() => removeItem('projects', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Habilidades</h2>
-              <button onClick={() => addItem('skills')} className="btn btn--action btn--sm">Agregar</button>
-            </div>
-            <div className="space-y-3">
-              {cv.skills.map((s, idx) => (
-                <div key={idx} className="grid grid-cols-4 gap-3 items-center">
-                  <input placeholder="Habilidad" className="border rounded p-2 col-span-3" value={s.name} onChange={(e) => {
-                    const arr = [...cv.skills];
-                    arr[idx] = { ...s, name: e.target.value };
-                    setCv({ ...cv, skills: arr });
-                  }} />
-                  <input type="number" min={1} max={5} className="border rounded p-2" value={s.level} onChange={(e) => {
-                    const arr = [...cv.skills];
-                    arr[idx] = { ...s, level: Number(e.target.value) };
-                    setCv({ ...cv, skills: arr });
-                  }} />
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Habilidades blandas</h2>
-              <button onClick={() => addItem('softSkills')} className="btn btn--action btn--sm">Agregar</button>
-            </div>
-            <div className="space-y-3">
-              {cv.softSkills.map((s, idx) => (
-                <div key={idx} className="flex gap-3 items-center">
-                  <input placeholder="Comunicación, trabajo en equipo..." className="flex-1 border rounded p-2" value={s} onChange={(e) => {
-                    const arr = [...cv.softSkills];
-                    arr[idx] = e.target.value;
-                    setCv({ ...cv, softSkills: arr });
-                  }} />
-                  <button onClick={() => removeItem('softSkills', idx)} className="btn btn--danger btn--sm">Borrar</button>
                 </div>
               ))}
             </div>

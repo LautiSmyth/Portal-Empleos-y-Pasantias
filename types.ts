@@ -145,8 +145,6 @@ export interface CV {
   universityEducation: UniversityEducation[];
   experience: WorkExperience[];
   projects: Project[];
-  skills: Skill[];
-  softSkills: string[];
   languages: LanguageSkill[];
   // Nuevas secciones de conocimientos técnicos categorizados
   technicalSkills: {
