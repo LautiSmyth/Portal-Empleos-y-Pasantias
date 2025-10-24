@@ -462,6 +462,18 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Características personales</h2>
+            </div>
+            <TechnicalSkillSelector
+              category="personal_characteristics"
+              predefinedOptions={COMPLEMENTARY_KNOWLEDGE_OPTIONS}
+              selectedSkills={cv.complementaryKnowledge || []}
+              onSkillsChange={(skills) => setCv({ ...cv, complementaryKnowledge: skills })}
+            />
+          </section>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+            <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Cursos de Capacitación</h2>
               <button onClick={() => addItem('trainingCourses')} className="btn btn--action btn--sm">Agregar</button>
             </div>
