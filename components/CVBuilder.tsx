@@ -53,6 +53,8 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           else setCv({
             ownerId,
             personal: { firstName: '', lastName: '', email: defaultEmail, phone: '', dni: '' },
+            profileSummary: '',
+            careerObjectives: '',
             links: {},
             education: [],
             experience: [],
@@ -63,6 +65,8 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           setCv({
             ownerId,
             personal: { firstName: '', lastName: '', email: defaultEmail, phone: '', dni: '', birthDate: '', locality: '' },
+            profileSummary: '',
+            careerObjectives: '',
             links: {},
             education: [],
             universityEducation: [],
@@ -320,7 +324,31 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
             </div>
           </section>
 
-          <section className="bg-white p-6 rounded-lg shadow">
+          <div className="space-y-6">
+            <section className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-2">Descripción del perfil (opcional)</h2>
+              <textarea
+                className="w-full border rounded p-3 min-h-[140px]"
+                placeholder="Escribe un resumen profesional, destacando tu experiencia, fortalezas y foco."
+                value={cv.profileSummary || ''}
+                onChange={(e) => update('profileSummary', e.target.value)}
+                rows={6}
+              />
+            </section>
+
+            <section className="bg-white p-6 rounded-lg shadow">
+              <h2 className="text-lg font-semibold mb-2">Objetivos laborales</h2>
+              <textarea
+                className="w-full border rounded p-3 min-h-[120px]"
+                placeholder="Detalla tus metas profesionales, áreas de interés y tipo de rol deseado."
+                value={cv.careerObjectives || ''}
+                onChange={(e) => update('careerObjectives', e.target.value)}
+                rows={5}
+              />
+            </section>
+          </div>
+
+          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <h2 className="text-lg font-semibold mb-4">Conocimientos Técnicos</h2>
 
             <div className="grid grid-cols-2 md:grid-cols-1 gap-6">

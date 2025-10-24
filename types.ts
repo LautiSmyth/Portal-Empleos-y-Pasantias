@@ -140,6 +140,8 @@ export interface CV {
     birthDate?: string; // formato DD/MM/YYYY
     locality?: string;
   };
+  profileSummary?: string;
+  careerObjectives?: string;
   links: { linkedin?: string; github?: string; portfolio?: string };
   education: Education[];
   universityEducation: UniversityEducation[];

@@ -57,6 +57,20 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
         </div>
       </div>
 
+      {cv.profileSummary && (
+        <div className="card">
+          <SectionTitle title="Descripción del perfil" />
+          <p className="text-gray-700 whitespace-pre-line">{cv.profileSummary}</p>
+        </div>
+      )}
+
+      {cv.careerObjectives && (
+        <div className="card">
+          <SectionTitle title="Objetivos laborales" />
+          <p className="text-gray-700 whitespace-pre-line">{cv.careerObjectives}</p>
+        </div>
+      )}
+
       {/* Links */}
       <div className="card">
         <SectionTitle title="Enlaces profesionales" />
