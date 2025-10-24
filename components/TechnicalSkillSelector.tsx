@@ -65,17 +65,18 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
   };
 
   // Verificar si una opción ya está seleccionada
+  const stripParens = (s: string) => s.replace(/\s*\([^)]*\)\s*/g, '').trim();
+  const normalize = (s: string) => stripParens(s).toLowerCase();
   const isSkillSelected = (skillName: string): boolean => {
-    return selectedSkills.some(skill => 
-      skill.name.toLowerCase() === skillName.toLowerCase()
-    );
+    return selectedSkills.some(skill => normalize(skill.name) === normalize(skillName));
   };
 
   // Agregar una habilidad
   const addSkill = (skillName: string, level: SkillLevel = SkillLevel.BASICO) => {
     if (!skillName.trim() || isSkillSelected(skillName)) return;
 
-    const newSkills = [...selectedSkills, { name: skillName.trim(), level }];
+    const cleanName = stripParens(skillName.trim());
+    const newSkills = [...selectedSkills, { name: cleanName, level }];
     onSkillsChange(newSkills);
     setSearchTerm('');
     setIsOpen(false);
@@ -83,8 +84,8 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
 
   // Remover una habilidad
   const removeSkill = (skillName: string) => {
-    const updatedSkills = selectedSkills.filter(skill => 
-      skill.name.toLowerCase() !== skillName.toLowerCase()
+    const updatedSkills = selectedSkills.filter(skill =>
+      normalize(skill.name) !== normalize(skillName)
     );
     onSkillsChange(updatedSkills);
   };
@@ -92,8 +93,8 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
   // Cambiar el nivel de una habilidad
   const updateSkillLevel = (skillName: string, newLevel: SkillLevel) => {
     const updatedSkills = selectedSkills.map(skill =>
-      skill.name.toLowerCase() === skillName.toLowerCase()
-        ? { ...skill, level: newLevel }
+      normalize(skill.name) === normalize(skillName)
+        ? { ...skill, name: stripParens(skill.name), level: newLevel }
         : skill
     );
     onSkillsChange(updatedSkills);
@@ -221,7 +222,7 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
                     : 'text-gray-900 cursor-pointer'
                 }`}
               >
-                {option}
+                {stripParens(option)}
                 {isSkillSelected(option) && (
                   <span className="ml-2 text-xs text-gray-500">(ya seleccionado)</span>
                 )}
@@ -296,13 +297,13 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
             Conocimientos seleccionados:
           </label>
           {selectedSkills.map((skill, index) => (
-            <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
-              <span className="text-sm">{skill.name}</span>
+            <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-md min-h-[44px]">
+              <span className="text-sm">{stripParens(skill.name)}</span>
               <select
-                aria-label={`Nivel para ${skill.name}`}
+                aria-label={`Nivel para ${stripParens(skill.name)}`}
                 value={skill.level}
                 onChange={(e) => updateSkillLevel(skill.name, e.target.value as SkillLevel)}
-                className="text-sm border border-gray-300 rounded-md px-3 py-2"
+                className="text-sm border border-gray-300 rounded-md px-3 py-2 h-9"
               >
                 <option value={SkillLevel.BASICO}>Básico</option>
                 <option value={SkillLevel.MEDIO}>Medio</option>
@@ -314,7 +315,9 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
               <button
                 type="button"
                 onClick={() => removeSkill(skill.name)}
-                className="ml-auto text-red-500 hover:text-red-700 text-sm"
+                aria-label={`Eliminar ${stripParens(skill.name)}`}
+                title="Eliminar"
+                className="ml-2 text-red-600 hover:text-red-700 text-xl p-1 rounded focus:outline-none focus:ring-2 focus:ring-red-300"
               >
                 ✕
               </button>

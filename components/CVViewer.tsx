@@ -17,6 +17,8 @@ const SectionTitle: React.FC<{ title: string }> = ({ title }) => (
   <h2 className="section-title">{title}</h2>
 );
 
+const stripParens = (s: string) => s.replace(/\s*\([^)]*\)\s*/g, '').trim();
+
 const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
   return (
     <div className={className || ''}>
@@ -163,7 +165,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.design.map((skill, idx) => (
                   <span key={idx} className="inline-block bg-purple-100 text-purple-800 text-sm px-2 py-1 rounded">
-                    {skill.name} ({skill.level})
+                    {stripParens(skill.name)} ({skill.level})
                   </span>
                 ))}
               </div>
@@ -177,7 +179,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.programming.map((skill, idx) => (
                   <span key={idx} className="inline-block bg-red-100 text-red-800 text-sm px-2 py-1 rounded">
-                    {skill.name} ({skill.level})
+                    {stripParens(skill.name)} ({skill.level})
                   </span>
                 ))}
               </div>
@@ -191,7 +193,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.managementSystems.map((skill, idx) => (
                   <span key={idx} className="inline-block bg-yellow-100 text-yellow-800 text-sm px-2 py-1 rounded">
-                    {skill.name} ({skill.level})
+                    {stripParens(skill.name)} ({skill.level})
                   </span>
                 ))}
               </div>
@@ -229,7 +231,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
           <div className="flex flex-wrap gap-2">
             {cv.complementaryKnowledge.map((knowledge, idx) => (
               <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
-                {knowledge.name} (nivel {knowledge.level})
+                {stripParens(knowledge.name)} (nivel {knowledge.level})
               </span>
             ))}
           </div>

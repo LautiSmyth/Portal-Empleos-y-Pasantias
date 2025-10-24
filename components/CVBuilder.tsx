@@ -320,113 +320,115 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
             </div>
           </section>
 
-          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
+          <section className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-lg font-semibold mb-4">Conocimientos Técnicos</h2>
-            
-            {/* Conocimientos de Ofimática */}
-            <div className="mb-6">
-              <h3 className="text-md font-medium mb-3">Software de Ofimática</h3>
-              <TechnicalSkillSelector
-                category="office"
-                predefinedOptions={OFFICE_SOFTWARE_OPTIONS}
-                selectedSkills={cv.technicalSkills?.office || []}
-                onSkillsChange={(skills) => {
-                  setCv({ 
-                    ...cv, 
-                    technicalSkills: { 
-                      ...cv.technicalSkills, 
-                      office: skills 
-                    } 
-                  });
-                }}
-                placeholder="Buscar software de ofimática (Word, Excel, PowerPoint...)"
-              />
-            </div>
 
-            {/* Conocimientos de Idiomas */}
-            <div className="mb-6">
-              <h3 className="text-md font-medium mb-3">Idiomas</h3>
-              <TechnicalSkillSelector
-                category="languages"
-                predefinedOptions={TECHNICAL_LANGUAGES_OPTIONS}
-                selectedSkills={cv.technicalSkills?.languages?.map(lang => ({ 
-                  name: lang.language, 
-                  level: lang.level 
-                })) || []}
-                onSkillsChange={(skills) => {
-                  setCv({ 
-                    ...cv, 
-                    technicalSkills: { 
-                      ...cv.technicalSkills, 
-                      languages: skills.map(skill => ({ 
-                        language: skill.name, 
-                        level: skill.level 
-                      }))
-                    } 
-                  });
-                }}
-                placeholder="Buscar idiomas (Inglés, Francés, Alemán...)"
-              />
-            </div>
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-6">
+              {/* Conocimientos de Ofimática */}
+              <div>
+                <h3 className="text-md font-medium mb-3">Software de Ofimática</h3>
+                <TechnicalSkillSelector
+                  category="office"
+                  predefinedOptions={OFFICE_SOFTWARE_OPTIONS}
+                  selectedSkills={cv.technicalSkills?.office || []}
+                  onSkillsChange={(skills) => {
+                    setCv({ 
+                      ...cv, 
+                      technicalSkills: { 
+                        ...cv.technicalSkills, 
+                        office: skills 
+                      } 
+                    });
+                  }}
+                  placeholder="Buscar software de ofimática (Word, Excel, PowerPoint...)"
+                />
+              </div>
 
-            {/* Conocimientos de Diseño */}
-            <div className="mb-6">
-              <h3 className="text-md font-medium mb-3">Software de Diseño</h3>
-              <TechnicalSkillSelector
-                category="design"
-                predefinedOptions={DESIGN_SOFTWARE_OPTIONS}
-                selectedSkills={cv.technicalSkills?.design || []}
-                onSkillsChange={(skills) => {
-                  setCv({ 
-                    ...cv, 
-                    technicalSkills: { 
-                      ...cv.technicalSkills, 
-                      design: skills 
-                    } 
-                  });
-                }}
-                placeholder="Buscar software de diseño (Photoshop, Illustrator, AutoCAD...)"
-              />
-            </div>
+              {/* Conocimientos de Idiomas */}
+              <div>
+                <h3 className="text-md font-medium mb-3">Idiomas</h3>
+                <TechnicalSkillSelector
+                  category="languages"
+                  predefinedOptions={TECHNICAL_LANGUAGES_OPTIONS}
+                  selectedSkills={cv.technicalSkills?.languages?.map(lang => ({ 
+                    name: lang.language, 
+                    level: lang.level 
+                  })) || []}
+                  onSkillsChange={(skills) => {
+                    setCv({ 
+                      ...cv, 
+                      technicalSkills: { 
+                        ...cv.technicalSkills, 
+                        languages: skills.map(skill => ({ 
+                          language: skill.name, 
+                          level: skill.level 
+                        }))
+                      } 
+                    });
+                  }}
+                  placeholder="Buscar idiomas (Inglés, Francés, Alemán...)"
+                />
+              </div>
 
-            {/* Conocimientos de Programación y Mecatrónica */}
-            <div className="mb-6">
-              <h3 className="text-md font-medium mb-3">Programación y Mecatrónica</h3>
-              <TechnicalSkillSelector
-                category="programming"
-                predefinedOptions={PROGRAMMING_MECHATRONICS_OPTIONS}
-                selectedSkills={cv.technicalSkills?.programming || []}
-                onSkillsChange={(skills) => {
-                  setCv({ 
-                    ...cv, 
-                    technicalSkills: { 
-                      ...cv.technicalSkills, 
-                      programming: skills 
-                    } 
-                  });
-                }}
-                placeholder="Buscar tecnologías (Python, PLC, MATLAB, CAD...)"
-              />
-            </div>
+              {/* Conocimientos de Diseño */}
+              <div>
+                <h3 className="text-md font-medium mb-3">Software de Diseño</h3>
+                <TechnicalSkillSelector
+                  category="design"
+                  predefinedOptions={DESIGN_SOFTWARE_OPTIONS}
+                  selectedSkills={cv.technicalSkills?.design || []}
+                  onSkillsChange={(skills) => {
+                    setCv({ 
+                      ...cv, 
+                      technicalSkills: { 
+                        ...cv.technicalSkills, 
+                        design: skills 
+                      } 
+                    });
+                  }}
+                  placeholder="Buscar software de diseño (Photoshop, Illustrator, AutoCAD...)"
+                />
+              </div>
 
-            {/* Sistemas de Gestión */}
-            <div className="mb-6">
-              <h3 className="text-md font-medium mb-3">Sistemas de Gestión</h3>
-              <TechnicalSkillSelector
-                category="managementSystems"
-                predefinedOptions={MANAGEMENT_SYSTEMS_OPTIONS}
-                selectedSkills={cv.technicalSkills?.managementSystems || []}
-                onSkillsChange={(skills) => {
-                  setCv({ 
-                    ...cv, 
-                    technicalSkills: { 
-                      ...cv.technicalSkills, 
-                      managementSystems: skills 
-                    } 
-                  });
-                }}
-                placeholder="Buscar sistemas de gestión (SAP, ERP, CRM...)"
-              />
+              {/* Conocimientos de Programación y Mecatrónica */}
+              <div>
+                <h3 className="text-md font-medium mb-3">Programación y Mecatrónica</h3>
+                <TechnicalSkillSelector
+                  category="programming"
+                  predefinedOptions={PROGRAMMING_MECHATRONICS_OPTIONS}
+                  selectedSkills={cv.technicalSkills?.programming || []}
+                  onSkillsChange={(skills) => {
+                    setCv({ 
+                      ...cv, 
+                      technicalSkills: { 
+                        ...cv.technicalSkills, 
+                        programming: skills 
+                      } 
+                    });
+                  }}
+                  placeholder="Buscar tecnologías (Python, PLC, MATLAB, CAD...)"
+                />
+              </div>
+
+              {/* Sistemas de Gestión */}
+              <div>
+                <h3 className="text-md font-medium mb-3">Sistemas de Gestión</h3>
+                <TechnicalSkillSelector
+                  category="managementSystems"
+                  predefinedOptions={MANAGEMENT_SYSTEMS_OPTIONS}
+                  selectedSkills={cv.technicalSkills?.managementSystems || []}
+                  onSkillsChange={(skills) => {
+                    setCv({ 
+                      ...cv, 
+                      technicalSkills: { 
+                        ...cv.technicalSkills, 
+                        managementSystems: skills 
+                      } 
+                    });
+                  }}
+                  placeholder="Buscar sistemas de gestión (SAP, ERP, CRM...)"
+                />
+              </div>
             </div>
           </section>
 
