@@ -296,12 +296,13 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
             Conocimientos seleccionados:
           </label>
           {selectedSkills.map((skill, index) => (
-            <div key={index} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-md">
-              <span className="flex-1 text-sm">{skill.name}</span>
+            <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded-md">
+              <span className="text-sm">{skill.name}</span>
               <select
+                aria-label={`Nivel para ${skill.name}`}
                 value={skill.level}
                 onChange={(e) => updateSkillLevel(skill.name, e.target.value as SkillLevel)}
-                className="text-xs border border-gray-300 rounded px-2 py-1"
+                className="text-sm border border-gray-300 rounded-md px-3 py-2"
               >
                 <option value={SkillLevel.BASICO}>Básico</option>
                 <option value={SkillLevel.MEDIO}>Medio</option>
@@ -313,7 +314,7 @@ const TechnicalSkillSelector: React.FC<TechnicalSkillSelectorProps> = ({
               <button
                 type="button"
                 onClick={() => removeSkill(skill.name)}
-                className="text-red-500 hover:text-red-700 text-sm"
+                className="ml-auto text-red-500 hover:text-red-700 text-sm"
               >
                 ✕
               </button>

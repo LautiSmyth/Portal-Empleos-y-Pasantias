@@ -33,6 +33,10 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
             <div className="font-medium">{cv.personal.email}</div>
           </div>
           <div>
+            <div className="text-sm text-gray-600">D.N.I</div>
+            <div className="font-medium">{cv.personal.dni}</div>
+          </div>
+          <div>
             <div className="text-sm text-gray-600">Teléfono</div>
             <div className="font-medium">{cv.personal.phone}</div>
           </div>
@@ -70,9 +74,9 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <div key={idx} className="space-y-1">
                 <div className="font-medium">{edu.career}</div>
                 <div className="text-gray-700">{edu.university}</div>
-                <div className="text-gray-600 text-sm">{edu.city}, {edu.province}</div>
+
                 <div className="text-gray-600 text-sm">
-                  Materias: {edu.approvedSubjects}/{edu.totalSubjects} | Año de ingreso: {edu.startYear}
+                  Materias: {edu.approvedSubjects}/{edu.totalSubjects} | Año de ingreso: {edu.startYear} | Año de egreso: {edu.graduationYear}
                 </div>
               </div>
             ))}
@@ -80,22 +84,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
         </div>
       )}
 
-      {/* Education */}
-      <div className="card">
-        <SectionTitle title="Formación académica" />
-        <div className="space-y-3">
-          {(cv.education || []).map((ed, idx) => (
-            <div key={idx} className="flex flex-wrap items-center gap-2">
-              <div className="font-medium">{ed.institution}</div>
-              <div className="text-gray-600">— {ed.degree}</div>
-              <div className="text-gray-500">({ed.start} - {ed.end})</div>
-            </div>
-          ))}
-          {(!cv.education || cv.education.length === 0) && (
-            <div className="text-gray-500 text-sm">Sin elementos</div>
-          )}
-        </div>
-      </div>
+
 
       {/* Experience */}
       <div className="card">
@@ -236,7 +225,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
       {/* Complementary Knowledge */}
       {cv.complementaryKnowledge && cv.complementaryKnowledge.length > 0 && (
         <div className="card">
-          <SectionTitle title="Conocimientos Complementarios" />
+          <SectionTitle title="Características personales" />
           <div className="flex flex-wrap gap-2">
             {cv.complementaryKnowledge.map((knowledge, idx) => (
               <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
@@ -260,18 +249,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
         </div>
       </div>
 
-      {/* Languages */}
-      <div className="card">
-        <SectionTitle title="Idiomas" />
-        <div className="flex flex-wrap gap-2">
-          {(cv.languages || []).map((l, idx) => (
-            <span key={idx} className="inline-block bg-gray-100 text-gray-800 text-sm px-2 py-1 rounded">{l.name} (Escrito: {l.written} / Oral: {l.spoken})</span>
-          ))}
-          {(!cv.languages || cv.languages.length === 0) && (
-            <div className="text-gray-500 text-sm">Sin elementos</div>
-          )}
-        </div>
-      </div>
+
     </div>
   );
 };

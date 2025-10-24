@@ -42,6 +42,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
             lastName: dbCV.personal.lastName || '',
             email: dbCV.personal.email || defaultEmail || '',
             phone: dbCV.personal.phone || '',
+            dni: dbCV.personal.dni || '',
           },
         } as CV;
         setCv(merged);
@@ -51,7 +52,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
           if (raw) setCv(JSON.parse(raw));
           else setCv({
             ownerId,
-            personal: { firstName: '', lastName: '', email: defaultEmail, phone: '' },
+            personal: { firstName: '', lastName: '', email: defaultEmail, phone: '', dni: '' },
             links: {},
             education: [],
             experience: [],
@@ -61,7 +62,7 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
         } catch {
           setCv({
             ownerId,
-            personal: { firstName: '', lastName: '', email: defaultEmail, phone: '', birthDate: '', locality: '' },
+            personal: { firstName: '', lastName: '', email: defaultEmail, phone: '', dni: '', birthDate: '', locality: '' },
             links: {},
             education: [],
             universityEducation: [],
@@ -107,11 +108,10 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
         universityEducation: { 
           career: UniversityCareer.INGENIERIA_INDUSTRIAL, 
           university: '', 
-          city: '', 
-          province: '', 
           approvedSubjects: 0, 
           totalSubjects: 0, 
-          startYear: new Date().getFullYear() 
+          startYear: new Date().getFullYear(),
+          graduationYear: new Date().getFullYear()
         },
         experience: { company: '', role: '', responsibilities: '', start: '', end: '' },
         projects: { title: '', description: '', technologies: [], link: '' },
@@ -172,6 +172,10 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
     return true;
   };
 
+  const validateDni = (dni: string): boolean => {
+    return /^\d{7,9}$/.test((dni || '').trim());
+  };
+
   // Lista de localidades argentinas (muestra)
   const argentineLocalities = [
     'Buenos Aires', 'Córdoba', 'Rosario', 'Mendoza', 'La Plata', 'San Miguel de Tucumán',
@@ -207,6 +211,27 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
   const save = async () => {
     if (!cv) return;
     setError(null);
+
+    // Validación: DNI obligatorio y formato correcto
+    if (!cv.personal?.dni || !validateDni(cv.personal.dni)) {
+      setError('El DNI es obligatorio y debe tener entre 7 y 9 dígitos.');
+      return;
+    }
+
+    // Validación: fechas de experiencia en formato MM/YYYY si están presentes
+    const mmYYYY = /^(0[1-9]|1[0-2])\/\d{4}$/;
+    const invalidExp = (cv.experience || []).find((ex) => {
+      const start = (ex.start || '').trim();
+      const end = (ex.end || '').trim();
+      const startInvalid = start && !mmYYYY.test(start);
+      const endInvalid = end && !mmYYYY.test(end);
+      return startInvalid || endInvalid;
+    });
+    if (invalidExp) {
+      setError('Fechas de experiencia deben estar en formato MM/YYYY.');
+      return;
+    }
+
     setSaving(true);
     const res = await saveCV(ownerId, cv);
     setSaving(false);
@@ -247,6 +272,20 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
               <div>
                 <label className="block text-sm">Email</label>
                 <input type="email" className="w-full border rounded p-2" value={cv.personal.email} onChange={(e) => update('personal.email', e.target.value)} />
+              </div>
+              <div>
+                <label className="block text-sm">D.N.I (solo números)</label>
+                <input 
+                  className={`w-full border rounded p-2 ${cv.personal.dni && !validateDni(cv.personal.dni) ? 'border-red-500' : ''}`}
+                  inputMode="numeric"
+                  pattern="[0-9]{7,9}"
+                  placeholder="########"
+                  value={cv.personal.dni}
+                  onChange={(e) => update('personal.dni', e.target.value)}
+                />
+                {(!cv.personal.dni || !validateDni(cv.personal.dni)) && (
+                  <p className="text-red-500 text-xs mt-1">Ingrese un DNI válido (7 a 9 dígitos)</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm">Teléfono</label>
@@ -531,30 +570,6 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                     </datalist>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-1">Ciudad</label>
-                    <input 
-                      className="w-full border rounded p-2" 
-                      value={edu.city} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, city: e.target.value };
-                        setCv({ ...cv, universityEducation: arr });
-                      }} 
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1">Provincia</label>
-                    <input 
-                      className="w-full border rounded p-2" 
-                      value={edu.province} 
-                      onChange={(e) => {
-                        const arr = [...(cv.universityEducation || [])];
-                        arr[idx] = { ...edu, province: e.target.value };
-                        setCv({ ...cv, universityEducation: arr });
-                      }} 
-                    />
-                  </div>
-                  <div>
                     <label className="block text-sm font-medium mb-1">Materias aprobadas</label>
                     <input 
                       type="number" 
@@ -597,6 +612,21 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
                       }} 
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1">Año egreso</label>
+                    <input 
+                      type="number" 
+                      min="1950" 
+                      max={new Date().getFullYear()} 
+                      className="w-full border rounded p-2" 
+                      value={edu.graduationYear} 
+                      onChange={(e) => {
+                        const arr = [...(cv.universityEducation || [])];
+                        arr[idx] = { ...edu, graduationYear: parseInt(e.target.value) || new Date().getFullYear() };
+                        setCv({ ...cv, universityEducation: arr });
+                      }} 
+                    />
+                  </div>
                   <div className="flex items-end">
                     <button onClick={() => removeItem('universityEducation', idx)} className="btn btn--danger btn--sm w-full">Borrar</button>
                   </div>
@@ -612,159 +642,14 @@ const CVBuilder: React.FC<CVBuilderProps> = ({ ownerId, title = 'Constructor de 
 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Conocimientos Complementarios</h2>
+              <h2 className="text-lg font-semibold">Características personales</h2>
             </div>
             <TechnicalSkillSelector
-              category="Conocimientos Complementarios"
+              category="personal_characteristics"
               predefinedOptions={COMPLEMENTARY_KNOWLEDGE_OPTIONS}
               selectedSkills={cv.complementaryKnowledge || []}
               onSkillsChange={(skills) => setCv({ ...cv, complementaryKnowledge: skills })}
             />
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow">
-            <h2 className="text-lg font-semibold mb-4">Enlaces profesionales</h2>
-            <div className="space-y-3">
-              <input placeholder="LinkedIn" className="w-full border rounded p-2" value={cv.links.linkedin || ''} onChange={(e) => update('links.linkedin', e.target.value)} />
-              <input placeholder="GitHub" className="w-full border rounded p-2" value={cv.links.github || ''} onChange={(e) => update('links.github', e.target.value)} />
-              <input placeholder="Portafolio" className="w-full border rounded p-2" value={cv.links.portfolio || ''} onChange={(e) => update('links.portfolio', e.target.value)} />
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Formación académica</h2>
-              <button onClick={() => addItem('education')} className="btn btn--action btn--sm">Agregar</button>
-            </div>
-            <div className="space-y-4">
-              {cv.education.map((ed, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                  <input placeholder="Institución" className="border rounded p-2" value={ed.institution} onChange={(e) => {
-                    const arr = [...cv.education];
-                    arr[idx] = { ...ed, institution: e.target.value };
-                    setCv({ ...cv, education: arr });
-                  }} />
-                  <input placeholder="Título" className="border rounded p-2" value={ed.degree} onChange={(e) => {
-                    const arr = [...cv.education];
-                    arr[idx] = { ...ed, degree: e.target.value };
-                    setCv({ ...cv, education: arr });
-                  }} />
-                  <input placeholder="Inicio" className="border rounded p-2" value={ed.start} onChange={(e) => {
-                    const arr = [...cv.education];
-                    arr[idx] = { ...ed, start: e.target.value };
-                    setCv({ ...cv, education: arr });
-                  }} />
-                  <input placeholder="Fin" className="border rounded p-2" value={ed.end} onChange={(e) => {
-                    const arr = [...cv.education];
-                    arr[idx] = { ...ed, end: e.target.value };
-                    setCv({ ...cv, education: arr });
-                  }} />
-                  <button onClick={() => removeItem('education', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Experiencia laboral</h2>
-              <button onClick={() => addItem('experience')} className="btn btn--action btn--sm">Agregar</button>
-            </div>
-            <div className="space-y-4">
-              {cv.experience.map((ex, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-6 gap-3">
-                  <input placeholder="Empresa" className="border rounded p-2" value={ex.company} onChange={(e) => {
-                    const arr = [...cv.experience];
-                    arr[idx] = { ...ex, company: e.target.value };
-                    setCv({ ...cv, experience: arr });
-                  }} />
-                  <input placeholder="Puesto" className="border rounded p-2" value={ex.role} onChange={(e) => {
-                    const arr = [...cv.experience];
-                    arr[idx] = { ...ex, role: e.target.value };
-                    setCv({ ...cv, experience: arr });
-                  }} />
-                  <input placeholder="Responsabilidades" className="border rounded p-2" value={ex.responsibilities} onChange={(e) => {
-                    const arr = [...cv.experience];
-                    arr[idx] = { ...ex, responsibilities: e.target.value };
-                    setCv({ ...cv, experience: arr });
-                  }} />
-                  <input placeholder="Inicio" className="border rounded p-2" value={ex.start} onChange={(e) => {
-                    const arr = [...cv.experience];
-                    arr[idx] = { ...ex, start: e.target.value };
-                    setCv({ ...cv, experience: arr });
-                  }} />
-                  <input placeholder="Fin" className="border rounded p-2" value={ex.end} onChange={(e) => {
-                    const arr = [...cv.experience];
-                    arr[idx] = { ...ex, end: e.target.value };
-                    setCv({ ...cv, experience: arr });
-                  }} />
-                  <button onClick={() => removeItem('experience', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Proyectos</h2>
-              <button onClick={() => addItem('projects')} className="btn btn--action btn--sm">Agregar</button>
-            </div>
-            <div className="space-y-4">
-              {cv.projects.map((p, idx) => (
-                <div key={idx} className="grid grid-cols-1 md:grid-cols-5 gap-3">
-                  <input placeholder="Título" className="border rounded p-2" value={p.title} onChange={(e) => {
-                    const arr = [...cv.projects];
-                    arr[idx] = { ...p, title: e.target.value };
-                    setCv({ ...cv, projects: arr });
-                  }} />
-                  <input placeholder="Tecnologías (coma)" className="border rounded p-2" value={p.technologies.join(', ')} onChange={(e) => {
-                    const arr = [...cv.projects];
-                    arr[idx] = { ...p, technologies: e.target.value.split(',').map(t => t.trim()).filter(Boolean) };
-                    setCv({ ...cv, projects: arr });
-                  }} />
-                  <input placeholder="Enlace" className="border rounded p-2" value={p.link || ''} onChange={(e) => {
-                    const arr = [...cv.projects];
-                    arr[idx] = { ...p, link: e.target.value };
-                    setCv({ ...cv, projects: arr });
-                  }} />
-                  <input placeholder="Descripción" className="border rounded p-2 md:col-span-2" value={p.description} onChange={(e) => {
-                    const arr = [...cv.projects];
-                    arr[idx] = { ...p, description: e.target.value };
-                    setCv({ ...cv, projects: arr });
-                  }} />
-                  <button onClick={() => removeItem('projects', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="bg-white p-6 rounded-lg shadow">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold">Idiomas</h2>
-              <button onClick={() => addItem('languages')} className="btn btn--action btn--sm">Agregar</button>
-            </div>
-            <div className="space-y-3">
-              {cv.languages.map((l, idx) => (
-                <div key={idx} className="grid grid-cols-4 gap-3">
-                  <input placeholder="Idioma" className="border rounded p-2" value={l.name} onChange={(e) => {
-                    const arr = [...cv.languages];
-                    arr[idx] = { ...l, name: e.target.value };
-                    setCv({ ...cv, languages: arr });
-                  }} />
-                  <input placeholder="Nivel escrito" className="border rounded p-2" value={l.written} onChange={(e) => {
-                    const arr = [...cv.languages];
-                    arr[idx] = { ...l, written: e.target.value };
-                    setCv({ ...cv, languages: arr });
-                  }} />
-                  <input placeholder="Nivel oral" className="border rounded p-2" value={l.spoken} onChange={(e) => {
-                    const arr = [...cv.languages];
-                    arr[idx] = { ...l, spoken: e.target.value };
-                    setCv({ ...cv, languages: arr });
-                  }} />
-                  <button onClick={() => removeItem('languages', idx)} className="btn btn--danger btn--sm">Borrar</button>
-                </div>
-              ))}
-            </div>
           </section>
 
           <section className="bg-white p-6 rounded-lg shadow lg:col-span-2">

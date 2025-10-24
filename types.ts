@@ -95,11 +95,10 @@ export type Project = { title: string; description: string; technologies: string
 export type UniversityEducation = {
   career: UniversityCareer;
   university: string;
-  city: string;
-  province: string;
   approvedSubjects: number;
   totalSubjects: number;
   startYear: number;
+  graduationYear: number;
 };
 
 export type TechnicalSkill = {
@@ -137,6 +136,7 @@ export interface CV {
     lastName: string; 
     email: string; 
     phone: string;
+    dni: string;
     birthDate?: string; // formato DD/MM/YYYY
     locality?: string;
   };
