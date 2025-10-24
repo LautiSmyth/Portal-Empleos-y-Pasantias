@@ -65,6 +65,20 @@ const DesignSystem: React.FC = () => {
           </Box>
         </section>
 
+        {/* Chips */}
+        <section className="u-mb-6">
+          <h2>Chips</h2>
+          <Box>
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+              <span className="chip chip--blue">Photoshop (Avanzado)</span>
+              <span className="chip chip--green">Inglés (B2)</span>
+              <span className="chip chip--purple">Figma (Intermedio)</span>
+              <span className="chip chip--red">Python (Avanzado)</span>
+              <span className="chip chip--yellow">SAP (Básico)</span>
+            </div>
+          </Box>
+        </section>
+
         <section className="u-mb-6">
           <h2>Tokens y Variables CSS</h2>
           <Box>

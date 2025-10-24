@@ -143,7 +143,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
           <SectionTitle title="Características personales" />
           <div className="flex flex-wrap gap-2">
             {cv.complementaryKnowledge.map((knowledge, idx) => (
-              <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+              <span key={idx} className="chip chip--blue">
                 {stripParens(knowledge.name)} (nivel {knowledge.level})
               </span>
             ))}
@@ -162,7 +162,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <h3 className="font-medium text-gray-800 mb-2">Software de Ofimática</h3>
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.office.map((skill, idx) => (
-                  <span key={idx} className="inline-block bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">
+                  <span key={idx} className="chip chip--blue">
                     {skill.name} ({skill.level})
                   </span>
                 ))}
@@ -176,7 +176,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <h3 className="font-medium text-gray-800 mb-2">Idiomas</h3>
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.languages.map((lang, idx) => (
-                  <span key={idx} className="inline-block bg-green-100 text-green-800 text-sm px-2 py-1 rounded">
+                  <span key={idx} className="chip chip--green">
                     {lang.language} ({lang.level})
                   </span>
                 ))}
@@ -190,7 +190,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <h3 className="font-medium text-gray-800 mb-2">Software de Diseño</h3>
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.design.map((skill, idx) => (
-                  <span key={idx} className="inline-block bg-purple-100 text-purple-800 text-sm px-2 py-1 rounded">
+                  <span key={idx} className="chip chip--purple">
                     {stripParens(skill.name)} ({skill.level})
                   </span>
                 ))}
@@ -204,7 +204,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <h3 className="font-medium text-gray-800 mb-2">Programación y Mecatrónica</h3>
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.programming.map((skill, idx) => (
-                  <span key={idx} className="inline-block bg-red-100 text-red-800 text-sm px-2 py-1 rounded">
+                  <span key={idx} className="chip chip--red">
                     {stripParens(skill.name)} ({skill.level})
                   </span>
                 ))}
@@ -218,7 +218,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
               <h3 className="font-medium text-gray-800 mb-2">Sistemas de Gestión</h3>
               <div className="flex flex-wrap gap-2">
                 {cv.technicalSkills.managementSystems.map((skill, idx) => (
-                  <span key={idx} className="inline-block bg-yellow-100 text-yellow-800 text-sm px-2 py-1 rounded">
+                  <span key={idx} className="chip chip--yellow">
                     {stripParens(skill.name)} ({skill.level})
                   </span>
                 ))}

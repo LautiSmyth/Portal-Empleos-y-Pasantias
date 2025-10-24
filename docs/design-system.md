@@ -86,6 +86,23 @@ Clases para grid y responsive:
 - `ui-grid--responsive` define 1/2/3 columnas según `sm`, `md`, `lg`.
 - Usa `ui-card` para superficies con borde, radio y sombra estándar.
 
+## Chips
+Etiquetas compactas para listar habilidades, tecnologías o estados.
+
+Uso (clases):
+```html
+<span class="chip chip--blue">Photoshop (Avanzado)</span>
+<span class="chip chip--green">Inglés (B2)</span>
+<span class="chip chip--purple">Figma (Intermedio)</span>
+<span class="chip chip--red">Python (Avanzado)</span>
+<span class="chip chip--yellow">SAP (Básico)</span>
+```
+
+Notas de diseño:
+- En claro, las variantes usan tonos `*-100` de fondo y `*-800` de texto.
+- En oscuro, el fondo se convierte en overlay tonal (`accent-500` con alpha) y el texto en `*-300` para legibilidad (≈16:1 sobre superficies oscuras).
+- Borde sutil con `--color-border` en claro y alpha en oscuro.
+
 ## Espaciado
 Utilidades mínimas: `.u-mb-2`, `.u-mb-4`, `.u-mb-6`, `.u-p-4`, `.u-p-6`. Amplía según necesidades usando los tokens de `--space-*`.
 
@@ -102,3 +119,27 @@ Breakpoints de referencia: `sm: 640px`, `md: 768px`, `lg: 1024px`, `xl: 1280px`.
 - Añadir `Typography` component para tipografía programática.
 - Agregar componentes `Input`, `Select`, `Textarea` con estados y validación.
 - Unificar clases de `Card` y migrar superficies existentes.
+
+## Modo oscuro (Material Design)
+El tema oscuro sigue las guías de Material Design:
+- Fondo base `#121212` y superficies elevadas `#1E1E1E`.
+- Texto con opacidades: primario 87%, secundario 60%, deshabilitado 38%.
+- Jerarquía visual mediante elevación: `--shadow-sm`, `--shadow-md`, `--shadow-lg`.
+- Paleta primaria ajustada para buen contraste sobre fondos oscuros.
+
+Tokens relevantes (ver `:root[data-theme="dark"]` en `styles/design-system.css`):
+- `--color-bg`, `--color-surface`, `--color-border`
+- `--color-text`, `--color-muted`, `--color-disabled-text`
+- `--color-primary`, `--color-primary-hover`, `--color-primary-active`
+
+Utilidades:
+- `.text-body` para texto principal (87%)
+- `.text-secondary` para texto secundario (60%)
+- `.text-disabled` para texto deshabilitado (38%)
+
+Componentes:
+- `ui-card` aplica superficie, borde y elevación; en hover/active aumenta sombra.
+- Botones (`.btn--*`) ajustan hover/focus/active y respetan foco visible.
+
+Transiciones:
+- El cambio de tema aplica transición suave de 300ms para `background-color`, `color` y `border-color`.

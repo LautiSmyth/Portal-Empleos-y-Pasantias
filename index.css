@@ -32,6 +32,51 @@ body {
   --space-6: 24px;
 }
 
+/* Dark scheme hint */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Smooth theme transition */
+html, body, * {
+  transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+}
+
+/* Tailwind class overrides for dark mode surfaces/text */
+:root[data-theme="dark"] .bg-white { background-color: var(--color-surface) !important; }
+:root[data-theme="dark"] .bg-gray-50 { background-color: var(--color-bg) !important; }
+:root[data-theme="dark"] .bg-blue-50 { background-color: var(--color-surface) !important; }
+:root[data-theme="dark"] .bg-gray-200 { background-color: #262626 !important; }
+:root[data-theme="dark"] .text-gray-600 { color: var(--color-muted) !important; }
+:root[data-theme="dark"] .text-gray-700 { color: var(--color-text) !important; }
+:root[data-theme="dark"] .text-gray-800 { color: var(--color-text) !important; }
+:root[data-theme="dark"] .text-gray-500 { color: var(--color-muted) !important; }
+:root[data-theme="dark"] .text-gray-400 { color: var(--color-disabled-text) !important; }
+:root[data-theme="dark"] .border-gray-100 { border-color: var(--color-border) !important; }
+:root[data-theme="dark"] .border-gray-200 { border-color: var(--color-border) !important; }
+:root[data-theme="dark"] .border-gray-300 { border-color: var(--color-border) !important; }
+:root[data-theme="dark"] .hover\:bg-gray-100:hover { background-color: rgba(255,255,255,0.08) !important; }
+:root[data-theme="dark"] .hover\:bg-blue-50:hover { background-color: rgba(255,255,255,0.04) !important; }
+
+/* Divide overrides: ensure borders use dark token */
+:root[data-theme="dark"] .divide-y > :not([hidden]) ~ :not([hidden]) { border-color: var(--color-border) !important; }
+
+/* Alert overrides (yellow) for dark surfaces */
+:root[data-theme="dark"] .bg-yellow-50 { background-color: rgba(255, 193, 7, 0.12) !important; }
+:root[data-theme="dark"] .border-yellow-200 { border-color: rgba(255, 193, 7, 0.20) !important; }
+:root[data-theme="dark"] .text-yellow-800 { color: #facc15 !important; }
+
+/* Card overrides for dark (legacy .card usage) */
+:root[data-theme="dark"] .card {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  box-shadow: var(--shadow-sm) !important;
+}
+:root[data-theme="dark"] .card:hover { box-shadow: var(--shadow-md) !important; }
+:root[data-theme="dark"] .card:active { box-shadow: var(--shadow-lg) !important; }
+
+/* Buttons focus ring in dark */
+:root[data-theme="dark"] .btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 /* Design utilities */
 .btn {
   display: inline-flex;
