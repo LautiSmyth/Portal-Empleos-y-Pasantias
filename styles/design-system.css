@@ -3,34 +3,38 @@
    Edita estas variables para cambios globales. */
 
 :root {
-  /* Color palette */
-  --color-bg: #f8fafc; /* slate-50 */
-  --color-surface: #ffffff;
-  --color-border: #e5e7eb; /* gray-200 */
-  --color-text: #0f172a; /* slate-900 */
-  --color-muted: #64748b; /* slate-500 */
+  /* Color palette - Material Design (Light) */
+  --color-bg: #FAFAFA; /* background */
+  --color-surface: #FFFFFF; /* elevated surfaces */
+  --color-border: #E0E0E0; /* dividers */
+  --color-text: rgba(0, 0, 0, 0.87); /* primary text */
+  --color-muted: rgba(0, 0, 0, 0.60); /* secondary text */
 
-  --color-primary: #2563eb; /* blue-600 */
-  --color-primary-hover: #1d4ed8; /* blue-700 */
-  --color-primary-active: #1e40af; /* blue-800 */
+  /* Primary/brand palette aligned a Material Blue */
+  --color-primary: #1E88E5; /* Blue 600 */
+  --color-primary-hover: #1565C0; /* Blue 800 */
+  --color-primary-active: #0D47A1; /* Blue 900 */
   --color-primary-contrast: #ffffff;
 
-  --color-secondary: #0ea5e9; /* sky-500 */
-  --color-secondary-hover: #0284c7; /* sky-600 */
-  --color-secondary-active: #0369a1; /* sky-700 */
+  /* Secondary / support color (Cyan) */
+  --color-secondary: #00BCD4; /* Cyan 500 */
+  --color-secondary-hover: #0097A7; /* Cyan 700 */
+  --color-secondary-active: #00838F; /* Cyan 800 */
   --color-secondary-contrast: #ffffff;
 
-  --color-accent: #8b5cf6; /* violet-500 */
-  --color-accent-hover: #7c3aed; /* violet-600 */
-  --color-accent-active: #6d28d9; /* violet-700 */
+  /* Accent color (Purple) */
+  --color-accent: #8E24AA; /* Purple 600 */
+  --color-accent-hover: #7B1FA2; /* Purple 700 */
+  --color-accent-active: #4A148C; /* Purple 900 */
   --color-accent-contrast: #ffffff;
 
-  --color-success: #22c55e; /* green-500 */
-  --color-warning: #f59e0b; /* amber-500 */
-  --color-danger: #ef4444; /* red-500 */
+  /* Semantic */
+  --color-success: #43A047; /* Green 600 */
+  --color-warning: #FFB300; /* Amber 600 */
+  --color-danger: #E53935; /* Red 600 */
 
-  --color-disabled-bg: #e5e7eb; /* gray-200 */
-  --color-disabled-text: #9ca3af; /* gray-400 */
+  --color-disabled-bg: #E0E0E0; /* Gray 300-ish */
+  --color-disabled-text: rgba(0, 0, 0, 0.38); /* disabled text */
 
   /* Typography */
   --font-sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
@@ -175,12 +179,12 @@ h6 { font-size: var(--font-size-sm); line-height: var(--line-height-normal); fon
 }
 .chip + .chip { margin-left: 8px; }
 
-/* Light variants */
-.chip--blue { background: #dbeafe; color: #1e3a8a; border-color: #bfdbfe; }
-.chip--green { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-.chip--purple { background: #ede9fe; color: #4c1d95; border-color: #ddd6fe; }
-.chip--red { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
-.chip--yellow { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+/* Light variants (Material) */
+.chip--blue { background: #E3F2FD; color: #0D47A1; border-color: #BBDEFB; }
+.chip--green { background: #E8F5E9; color: #1B5E20; border-color: #C8E6C9; }
+.chip--purple { background: #EDE7F6; color: #311B92; border-color: #D1C4E9; }
+.chip--red { background: #FFEBEE; color: #B71C1C; border-color: #FFCDD2; }
+.chip--yellow { background: #FFFDE7; color: #F57F17; border-color: #FFF59D; }
 
 .chip:hover { filter: brightness(0.98); }
 
