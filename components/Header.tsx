@@ -59,31 +59,35 @@ const Header: React.FC = () => {
 
   return (
     <header className="app-header sticky top-0 z-50">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold brand-link">
-              Portal Empleos y Pasantías
-            </Link>
-          </div>
-          {/* Searchbar */}
-          <form onSubmit={onSearchSubmit} className="hidden md:flex flex-1 mx-6 max-w-xl">
-            <div className="searchbar w-full">
-              <svg className="searchbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-              <input
-                type="text"
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder="Buscar empleos: MySQL, Service Designer, Vue..."
-                className="searchbar__input"
-                aria-label="Buscar empleos"
-              />
+          {/* Left: brand + search aligned left-to-right */}
+          <div className="flex items-center gap-4 flex-1">
+            <div className="flex-shrink-0">
+              <Link to="/" className="text-2xl font-bold brand-link">
+                Portal Empleos y Pasantías
+              </Link>
             </div>
-          </form>
-          {/* Right actions: theme + auth */}
+            {/* Searchbar */}
+            <form onSubmit={onSearchSubmit} className="hidden md:flex items-center w-full max-w-2xl">
+              <div className="searchbar w-full">
+                <svg className="searchbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="11" cy="11" r="8" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+                <input
+                  type="text"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="Buscar empleos: MySQL, Service Designer, Vue..."
+                  className="searchbar__input"
+                />
+              </div>
+              <button type="submit" className="ml-2 btn btn--primary">Buscar</button>
+            </form>
+          </div>
+      
+          {/* Right: actions */}
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleTheme}
