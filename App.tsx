@@ -21,6 +21,8 @@ import AdminJobs from './pages/AdminJobs';
 import DesignSystem from './pages/DesignSystem';
 import StudentSidebar from './components/StudentSidebar';
 import StudentInvitations from './pages/StudentInvitations';
+import AdminSidebar from './components/AdminSidebar';
+import AdminInvitations from './pages/AdminInvitations';
 
 export type AuthUser = {
   id: string;
@@ -319,7 +321,8 @@ const App: React.FC = () => {
   // Determinar si la vista debe ocupar todo el ancho y sin padding (sidebar pegado a la izquierda)
   const isJobs = location.pathname === '/jobs' || location.pathname.startsWith('/jobs/');
   const isStudentArea = location.pathname.startsWith('/dashboard/student');
-  const mainClasses = (isJobs || isStudentArea)
+  const isAdminArea = location.pathname.startsWith('/dashboard/admin');
+  const mainClasses = (isJobs || isStudentArea || isAdminArea)
     ? 'flex-grow w-full px-0 py-8'
     : 'flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8';
 
@@ -338,9 +341,15 @@ const App: React.FC = () => {
               <Route path="/dashboard/student/invitations" element={<StudentInvitations />} />
             </Route>
             <Route path="/dashboard/company" element={<CompanyDashboard />} />
-            <Route path="/dashboard/admin" element={<AdminDashboard />} />
-            <Route path="/dashboard/admin/cv" element={<AdminCV />} />
-            <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
+-            <Route path="/dashboard/admin" element={<AdminDashboard />} />
+-            <Route path="/dashboard/admin/cv" element={<AdminCV />} />
+-            <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
++            <Route element={<AdminLayout />}> 
++              <Route path="/dashboard/admin" element={<AdminDashboard />} />
++              <Route path="/dashboard/admin/cv" element={<AdminCV />} />
++              <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
++              <Route path="/dashboard/admin/invitations" element={<AdminInvitations />} />
++            </Route>
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
@@ -367,6 +376,25 @@ const StudentLayout: React.FC = () => {
       {isStudent ? (
         <aside className="lg:col-span-1 sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
           <StudentSidebar />
+        </aside>
+      ) : (
+        <aside className="lg:col-span-1" />
+      )}
+      <div className="lg:col-span-3">
+        <Outlet />
+      </div>
+    </div>
+  );
+};
+
+const AdminLayout: React.FC = () => {
+  const auth = useContext(AuthContext);
+  const isAdmin = auth?.currentUser?.role === Role.ADMIN;
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      {isAdmin ? (
+        <aside className="lg:col-span-1 sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
+          <AdminSidebar />
         </aside>
       ) : (
         <aside className="lg:col-span-1" />

@@ -559,7 +559,7 @@ const AdminDashboard: React.FC = () => {
       </section>
 
       {/* Moderación de postulaciones */}
-      <section className="bg-white p-6 rounded-lg shadow-sm">
+      <section id="applications" className="bg-white p-6 rounded-lg shadow-sm">
         <h2 className="text-xl font-bold mb-4">Moderación de postulaciones</h2>
         <div className="divide-y">
           {recentApplications.map(a => (
