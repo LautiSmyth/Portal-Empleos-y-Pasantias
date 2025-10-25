@@ -9,7 +9,7 @@ import { fetchCompanies, fetchCompaniesByIds } from '../services/companiesServic
 import { fetchApplicationsByStudent } from '../services/applicationsService';
 import { fetchCVByOwnerId } from '../services/cvService';
 import StudentSidebar from '../components/StudentSidebar';
-+import AdminSidebar from '../components/AdminSidebar';
+import AdminSidebar from '../components/AdminSidebar';
 
 const getStatusColor = (status: ApplicationStatus) => {
   switch (status) {
