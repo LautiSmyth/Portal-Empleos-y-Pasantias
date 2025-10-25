@@ -267,6 +267,7 @@ h6 { font-size: var(--font-size-sm); line-height: var(--line-height-normal); fon
   --color-text: var(--md-sys-color-on-surface);
   --color-muted: rgba(255, 255, 255, 0.60);
   --color-disabled-text: rgba(255, 255, 255, 0.38);
+  --color-disabled-bg: rgba(255, 255, 255, 0.12);
 
   --color-primary: var(--md-sys-color-primary);
   --color-primary-hover: #2563eb;
