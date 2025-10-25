@@ -46,17 +46,41 @@ html, body, * {
 :root[data-theme="dark"] .border-yellow-200 { border-color: rgba(255, 193, 7, 0.20) !important; }
 :root[data-theme="dark"] .text-yellow-800 { color: #facc15 !important; }
 
-/* Card overrides for dark (legacy .card usage) */
-:root[data-theme="dark"] .card {
-  background: var(--color-surface) !important;
-  border-color: var(--color-border) !important;
-  box-shadow: var(--shadow-sm) !important;
-}
-:root[data-theme="dark"] .card:hover { box-shadow: var(--shadow-md) !important; }
-:root[data-theme="dark"] .card:active { box-shadow: var(--shadow-lg) !important; }
+
 
 /* Buttons focus ring in dark */
 :root[data-theme="dark"] .btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* Form controls overrides for dark mode */
+:root[data-theme="dark"] input[type="text"],
+:root[data-theme="dark"] input[type="email"],
+:root[data-theme="dark"] input[type="password"],
+:root[data-theme="dark"] input[type="number"],
+:root[data-theme="dark"] input[type="search"],
+:root[data-theme="dark"] input[type="url"],
+:root[data-theme="dark"] input:not([type]),
+:root[data-theme="dark"] select,
+:root[data-theme="dark"] textarea {
+  background-color: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border-color: var(--color-border) !important;
+  caret-color: var(--color-text) !important;
+}
+:root[data-theme="dark"] input::placeholder,
+:root[data-theme="dark"] textarea::placeholder {
+  color: var(--color-muted) !important;
+}
+:root[data-theme="dark"] input:focus,
+:root[data-theme="dark"] select:focus,
+:root[data-theme="dark"] textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-primary);
+  border-color: var(--color-primary);
+}
+:root[data-theme="dark"] select option {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
 
 /* Design utilities */
 .btn {
@@ -77,14 +101,7 @@ html, body, * {
 }
 .btn-primary:hover { background: var(--color-primary-hover); }
 
-.card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
-  padding: var(--space-6);
-  margin-bottom: var(--space-4);
-}
+
 
 .section-title {
   font-size: 1.125rem; /* text-lg */

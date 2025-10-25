@@ -23,7 +23,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
   return (
     <div className={className || ''}>
       {/* Personal */}
-      <div className="card">
+      <div className="ui-card u-mb-4">
         <SectionTitle title="Información personal" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -58,21 +58,21 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
       </div>
 
       {cv.profileSummary && (
-        <div className="card">
+        <div className="ui-card u-mb-4">
           <SectionTitle title="Descripción del perfil" />
           <p className="text-gray-700 whitespace-pre-line">{cv.profileSummary}</p>
         </div>
       )}
 
       {cv.careerObjectives && (
-        <div className="card">
+        <div className="ui-card u-mb-4">
           <SectionTitle title="Objetivos laborales" />
           <p className="text-gray-700 whitespace-pre-line">{cv.careerObjectives}</p>
         </div>
       )}
 
       {/* Links */}
-      <div className="card">
+      <div className="ui-card u-mb-4">
         <SectionTitle title="Enlaces profesionales" />
         <div className="space-y-2">
           {cv.links?.linkedin && <div><span className="text-sm text-gray-600">LinkedIn: </span><a href={cv.links.linkedin} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline">{cv.links.linkedin}</a></div>}
@@ -82,7 +82,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
       </div>
 
       {/* Experience */}
-      <div className="card">
+      <div className="ui-card u-mb-4">
         <SectionTitle title="Experiencia laboral" />
         <div className="space-y-3">
           {(cv.experience || []).map((ex, idx) => (
@@ -99,7 +99,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
       </div>
 
       {/* Projects */}
-      <div className="card">
+      <div className="ui-card u-mb-4">
         <SectionTitle title="Proyectos" />
         <div className="space-y-3">
           {(cv.projects || []).map((p, idx) => (
@@ -120,7 +120,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
 
       {/* University Education */}
       {cv.universityEducation && cv.universityEducation.length > 0 && (
-        <div className="card">
+        <div className="ui-card u-mb-4">
           <SectionTitle title="Formación universitaria" />
           <div className="space-y-3">
             {cv.universityEducation.map((edu, idx) => (
@@ -139,7 +139,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
 
       {/* Complementary Knowledge */}
       {cv.complementaryKnowledge && cv.complementaryKnowledge.length > 0 && (
-        <div className="card">
+        <div className="ui-card u-mb-4">
           <SectionTitle title="Características personales" />
           <div className="flex flex-wrap gap-2">
             {cv.complementaryKnowledge.map((knowledge, idx) => (
@@ -153,7 +153,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
 
       {/* Technical Skills */}
       {cv.technicalSkills && (
-        <div className="card">
+        <div className="ui-card u-mb-4">
           <SectionTitle title="Conocimientos técnicos" />
           
           {/* Office Skills */}
@@ -230,7 +230,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
 
       {/* Training Courses */}
       {cv.trainingCourses && cv.trainingCourses.length > 0 && (
-        <div className="card">
+        <div className="ui-card u-mb-4">
           <SectionTitle title="Cursos de capacitación" />
           <div className="space-y-3">
             {cv.trainingCourses.map((course, idx) => (
@@ -251,7 +251,7 @@ const CVViewer: React.FC<CVViewerProps> = ({ cv, className }) => {
       )}
 
       {/* Skills */}
-      <div className="card">
+      <div className="ui-card u-mb-4">
         <SectionTitle title="Habilidades" />
         <div className="flex flex-wrap gap-2">
           {(cv.skills || []).map((s, idx) => (

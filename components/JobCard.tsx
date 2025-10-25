@@ -35,7 +35,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, company }) => {
   };
 
   return (
-    <div className="card flex flex-col">
+    <div className="ui-card flex flex-col">
       <div className="flex items-start space-x-4">
         {company && <img src={company.logoUrl} alt={`${company.name} logo`} className="w-16 h-16 rounded-md object-cover"/>}
         <div className="flex-1">
