@@ -418,7 +418,7 @@ const AdminDashboard: React.FC = () => {
           </div>
           <div className="flex items-end gap-2">
             <button className="px-4 py-2 bg-blue-600 text-white rounded disabled:opacity-50" onClick={handleSearchProfiles} disabled={searchingProfiles}>Buscar</button>
-            <button className="px-4 py-2 bg-gray-300 text-gray-700 rounded" onClick={handleClearFilters}>Limpiar</button>
+            <button className="btn btn--outline btn--md" onClick={handleClearFilters}>Limpiar</button>
           </div>
         </div>
         <div className="divide-y">
@@ -431,10 +431,10 @@ const AdminDashboard: React.FC = () => {
                   <p className="text-sm text-gray-600">Email: {p.email || '—'}</p>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <span className={`px-2 py-1 text-xs rounded ${p.company_verified ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                  <span className={`${p.company_verified ? 'chip chip--green' : 'chip'}`}>
                     Empresa verificada: {p.company_verified ? 'Sí' : 'No'}
                   </span>
-                  <span className={`px-2 py-1 text-xs rounded ${p.email_verified ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                  <span className={`${p.email_verified ? 'chip chip--green' : 'chip'}`}>
                     Email verificado: {p.email_verified ? 'Sí' : 'No'}
                   </span>
                   <button
@@ -488,7 +488,7 @@ const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="flex items-end gap-2">
                     <button className="px-4 py-2 bg-green-600 text-white rounded disabled:opacity-50" onClick={saveEditProfile} disabled={savingProfile}>Guardar</button>
-                    <button className="px-4 py-2 bg-gray-300 text-gray-700 rounded" onClick={cancelEditProfile}>Cancelar</button>
+                    <button className="btn btn--outline btn--md" onClick={cancelEditProfile}>Cancelar</button>
                   </div>
                 </div>
               )}
