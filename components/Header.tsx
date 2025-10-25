@@ -1,19 +1,47 @@
 
-import React, { useContext } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import React, { useContext, useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../App';
 import { Role } from '../types';
 import { useTheme } from '../hooks/useTheme';
+import { fetchCVByOwnerId } from '../services/cvService';
 
 const Header: React.FC = () => {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
   const isDev = (import.meta as any).env?.DEV ?? false;
   const { isDark, toggleTheme } = useTheme();
+  const [keyword, setKeyword] = useState('');
+  const [profileName, setProfileName] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      const userId = auth?.currentUser?.id;
+      if (!userId) { setProfileName(null); return; }
+      try {
+        const { cv } = await fetchCVByOwnerId(userId);
+        const nameFromCv = cv?.personal?.firstName && cv?.personal?.lastName
+          ? `${cv.personal.firstName} ${cv.personal.lastName}`
+          : null;
+        if (mounted) setProfileName(nameFromCv || auth?.currentUser?.name || null);
+      } catch {
+        if (mounted) setProfileName(auth?.currentUser?.name || null);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [auth?.currentUser?.id]);
   const handleLogout = () => {
     auth?.logout();
     navigate('/');
+  };
+
+  const onSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = keyword.trim();
+    if (q) navigate(`/jobs?q=${encodeURIComponent(q)}`);
+    else navigate('/jobs');
   };
 
   const getDashboardLink = () => {
@@ -30,42 +58,32 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
+    <header className="app-header sticky top-0 z-50">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex-shrink-0">
-            <Link to="/" className="text-2xl font-bold text-blue-600 hover:text-blue-700">
+            <Link to="/" className="text-2xl font-bold brand-link">
               UniJobs Connect
             </Link>
           </div>
-          <nav className="hidden md:flex items-center space-x-8">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `text-gray-600 hover:text-blue-600 transition-colors ${isActive ? 'font-semibold text-blue-600' : ''}`
-              }
-            >
-              Home
-            </NavLink>
-            <NavLink
-              to="/jobs"
-              className={({ isActive }) =>
-                `text-gray-600 hover:text-blue-600 transition-colors ${isActive ? 'font-semibold text-blue-600' : ''}`
-              }
-            >
-              Jobs
-            </NavLink>
-            {auth?.currentUser && (
-               <NavLink
-                to={getDashboardLink()}
-                className={({ isActive }) =>
-                  `text-gray-600 hover:text-blue-600 transition-colors ${isActive ? 'font-semibold text-blue-600' : ''}`
-                }
-              >
-                Dashboard
-              </NavLink>
-            )}
-          </nav>
+          {/* Searchbar */}
+          <form onSubmit={onSearchSubmit} className="hidden md:flex flex-1 mx-6 max-w-xl">
+            <div className="searchbar w-full">
+              <svg className="searchbar__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Buscar empleos: MySQL, Service Designer, Vue..."
+                className="searchbar__input"
+                aria-label="Buscar empleos"
+              />
+            </div>
+          </form>
+          {/* Right actions: theme + auth */}
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleTheme}
@@ -93,23 +111,45 @@ const Header: React.FC = () => {
               </div>
             )}
             {auth?.currentUser ? (
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-500 rounded-md hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
-              >
-                Cerrar sesión
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => setMenuOpen(s => !s)}
+                  className="px-3 py-2 text-sm font-medium bg-white border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
+                >
+                  {profileName || 'Mi perfil'}
+                </button>
+                {menuOpen && (
+                  <div role="menu" className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-1 z-50">
+                    <button
+                      onClick={() => { setMenuOpen(false); navigate('/dashboard/student/cv'); }}
+                      className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                      role="menuitem"
+                    >
+                      Editar perfil
+                    </button>
+                    <button
+                      onClick={() => { setMenuOpen(false); handleLogout(); }}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"
+                      role="menuitem"
+                    >
+                      Cerrar sesión
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link 
                   to="/auth/login"
-                  className="px-4 py-2 text-sm font-medium text-blue-600 bg-white border border-blue-600 rounded-md hover:bg-blue-50 transition-colors"
+                  className="btn btn--outline btn--md"
                 >
                   Iniciar sesión
                 </Link>
                 <Link 
                   to="/auth/register"
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                  className="btn btn--primary btn--md"
                 >
                   Crear cuenta
                 </Link>

@@ -1,6 +1,6 @@
 
-import React, { useEffect, useMemo, useState, createContext } from 'react';
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useMemo, useState, createContext, useContext } from 'react';
+import { Routes, Route, useLocation, useNavigate, Outlet } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -19,6 +19,8 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import AdminCV from './pages/AdminCV';
 import AdminJobs from './pages/AdminJobs';
 import DesignSystem from './pages/DesignSystem';
+import StudentSidebar from './components/StudentSidebar';
+import StudentInvitations from './pages/StudentInvitations';
 
 export type AuthUser = {
   id: string;
@@ -314,17 +316,27 @@ const App: React.FC = () => {
     [currentUser]
   );
 
+  // Determinar si la vista debe ocupar todo el ancho y sin padding (sidebar pegado a la izquierda)
+  const isJobs = location.pathname === '/jobs' || location.pathname.startsWith('/jobs/');
+  const isStudentArea = location.pathname.startsWith('/dashboard/student');
+  const mainClasses = (isJobs || isStudentArea)
+    ? 'flex-grow w-full px-0 py-8'
+    : 'flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8';
+
   return (
     <AuthContext.Provider value={authContextValue}>
       <div className="flex flex-col min-h-screen font-sans text-gray-800">
         <Header />
-        <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <main className={mainClasses}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/jobs" element={<JobListings />} />
             <Route path="/jobs/:jobId" element={<JobDetail />} />
-            <Route path="/dashboard/student" element={<StudentDashboard />} />
-            <Route path="/dashboard/student/cv" element={<StudentCV />} />
+            <Route element={<StudentLayout />}> 
+              <Route path="/dashboard/student" element={<StudentDashboard />} />
+              <Route path="/dashboard/student/cv" element={<StudentCV />} />
+              <Route path="/dashboard/student/invitations" element={<StudentInvitations />} />
+            </Route>
             <Route path="/dashboard/company" element={<CompanyDashboard />} />
             <Route path="/dashboard/admin" element={<AdminDashboard />} />
             <Route path="/dashboard/admin/cv" element={<AdminCV />} />
@@ -335,7 +347,8 @@ const App: React.FC = () => {
             <Route path="/design-system" element={<DesignSystem />} />
           </Routes>
         </main>
-        <Footer />
+        {/* Ocultar footer en la página de Empleos */}
+        {!isJobs && <Footer />}
         {/* Vercel Speed Insights para React. Pasamos la ruta actual para mejor agregación */}
         <SpeedInsights route={location.pathname} />
       </div>
@@ -344,3 +357,23 @@ const App: React.FC = () => {
 };
 
 export default App;
+
+
+const StudentLayout: React.FC = () => {
+  const auth = useContext(AuthContext);
+  const isStudent = auth?.currentUser?.role === Role.STUDENT;
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      {isStudent ? (
+        <aside className="lg:col-span-1 sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
+          <StudentSidebar />
+        </aside>
+      ) : (
+        <aside className="lg:col-span-1" />
+      )}
+      <div className="lg:col-span-3">
+        <Outlet />
+      </div>
+    </div>
+  );
+};

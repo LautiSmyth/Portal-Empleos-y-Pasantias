@@ -6,15 +6,16 @@ import { fetchApplicationsByStudent } from '../services/applicationsService';
 import { fetchJobsByIds } from '../services/jobsService';
 import { fetchCompaniesByIds } from '../services/companiesService';
 import { supabase } from '../services/supabaseClient';
+// import StudentSidebar from '../components/StudentSidebar';
 
 const getStatusColor = (status: ApplicationStatus) => {
     switch (status) {
-        case ApplicationStatus.HIRED: return 'bg-green-100 text-green-800';
-        case ApplicationStatus.INTERVIEW: return 'bg-blue-100 text-blue-800';
-        case ApplicationStatus.REVIEWED: return 'bg-yellow-100 text-yellow-800';
-        case ApplicationStatus.REJECTED: return 'bg-red-100 text-red-800';
+        case ApplicationStatus.HIRED: return 'chip chip--green';
+        case ApplicationStatus.INTERVIEW: return 'chip chip--blue';
+        case ApplicationStatus.REVIEWED: return 'chip chip--yellow';
+        case ApplicationStatus.REJECTED: return 'chip chip--red';
         case ApplicationStatus.PENDING:
-        default: return 'bg-gray-100 text-gray-800';
+        default: return 'chip';
     }
 }
 
@@ -79,7 +80,7 @@ const StudentDashboard: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-3xl font-bold mb-8">Student Dashboard</h1>
+            <h1 className="text-3xl font-bold mb-8">Panel del alumno</h1>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Profile Section */}
                 <div className="lg:col-span-1 bg-white p-6 rounded-lg shadow-sm">
@@ -88,7 +89,7 @@ const StudentDashboard: React.FC = () => {
                         <h2 className="text-2xl font-bold">{fullName}</h2>
                         {university && <p className="text-gray-600">{university}</p>}
                         <p className="text-sm text-gray-500 mt-1">{profile.email}</p>
-                        <Link to="/dashboard/student/cv" className="mt-4 w-full inline-block px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 text-center">
+                        <Link to="/dashboard/student/cv" className="mt-4 w-full btn btn--primary btn--md text-center">
                             Completar CV
                         </Link>
                     </div>
@@ -96,35 +97,35 @@ const StudentDashboard: React.FC = () => {
 
                 {/* My Applications Section */}
                 <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm">
-                    <h2 className="text-2xl font-bold mb-4">My Applications</h2>
+                    <h2 className="text-2xl font-bold mb-4">Mis postulaciones</h2>
                     <div className="space-y-4">
                         {applications.length > 0 ? applications.map(app => {
                             const job = jobsById[app.jobId];
                             const company = job ? companiesById[job.companyId] : undefined;
                             if (!job || !company) return (
-                                <div key={app.id} className="border p-4 rounded-md text-gray-500">Job no longer available</div>
+                                <div key={app.id} className="border p-4 rounded-md text-gray-500">Puesto no disponible</div>
                             );
 
                             return (
                                 <div key={app.id} className="border p-4 rounded-md flex items-center justify-between hover:bg-gray-50 transition-colors">
                                     <div>
-                                        <Link to={`/jobs/${job.id}`} className="font-bold text-lg text-blue-600 hover:underline">{job.title}</Link>
+                                        <Link to={`/jobs/${job.id}`} className="font-bold text-lg brand-link hover:underline">{job.title}</Link>
                                         <p className="text-gray-600">{company.name}</p>
-                                        <p className="text-sm text-gray-500 mt-1">Applied: {app.appliedAt.toLocaleDateString()}</p>
+                                        <p className="text-sm text-gray-500 mt-1">Postulado: {app.appliedAt.toLocaleDateString()}</p>
                                     </div>
-                                    <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusColor(app.status)}`}>
+                                    <span className={getStatusColor(app.status)}>
                                         {app.status}
                                     </span>
                                 </div>
                             );
                         }) : (
-                            <p className="text-gray-500">You haven't applied to any jobs yet.</p>
+                            <p className="text-gray-500">Todavía no te postulaste a empleos.</p>
                         )}
                     </div>
                 </div>
             </div>
         </div>
     );
-};
+}
 
 export default StudentDashboard;

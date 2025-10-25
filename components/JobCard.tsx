@@ -59,7 +59,7 @@ const JobCard: React.FC<JobCardProps> = ({ job, company }) => {
         <p className="text-xs text-gray-400">{timeSince(job.createdAt)}</p>
         <Link 
           to={`/jobs/${job.id}`} 
-          className="btn btn-primary"
+          className="btn btn--primary btn--md"
         >
           View Details
         </Link>
