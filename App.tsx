@@ -23,6 +23,7 @@ import StudentSidebar from './components/StudentSidebar';
 import StudentInvitations from './pages/StudentInvitations';
 import AdminSidebar from './components/AdminSidebar';
 import AdminInvitations from './pages/AdminInvitations';
+import AdminApplications from './pages/AdminApplications';
 
 export type AuthUser = {
   id: string;
@@ -335,20 +336,30 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/jobs" element={<JobListings />} />
             <Route path="/jobs/:jobId" element={<JobDetail />} />
-            <Route element={<StudentLayout />}> 
-              <Route path="/dashboard/student" element={<StudentDashboard />} />
-              <Route path="/dashboard/student/cv" element={<StudentCV />} />
-              <Route path="/dashboard/student/invitations" element={<StudentInvitations />} />
-            </Route>
+-            <Route element={<StudentLayout />}> 
+-              <Route path="/dashboard/student" element={<StudentDashboard />} />
+-              <Route path="/dashboard/student/cv" element={<StudentCV />} />
+-              <Route path="/dashboard/student/invitations" element={<StudentInvitations />} />
+-            </Route>
++            <Route path="/dashboard/student" element={<StudentLayout />}>
++              <Route index element={<StudentDashboard />} />
++              <Route path="cv" element={<StudentCV />} />
++              <Route path="invitations" element={<StudentInvitations />} />
++            </Route>
             <Route path="/dashboard/company" element={<CompanyDashboard />} />
--            <Route path="/dashboard/admin" element={<AdminDashboard />} />
--            <Route path="/dashboard/admin/cv" element={<AdminCV />} />
--            <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
-+            <Route element={<AdminLayout />}> 
-+              <Route path="/dashboard/admin" element={<AdminDashboard />} />
-+              <Route path="/dashboard/admin/cv" element={<AdminCV />} />
-+              <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
-+              <Route path="/dashboard/admin/invitations" element={<AdminInvitations />} />
+-            <Route element={<AdminLayout />}> 
+-              <Route path="/dashboard/admin" element={<AdminDashboard />} />
+-              <Route path="/dashboard/admin/cv" element={<AdminCV />} />
+-              <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
+-              <Route path="/dashboard/admin/invitations" element={<AdminInvitations />} />
+-              <Route path="/dashboard/admin/applications" element={<AdminApplications />} />
+-            </Route>
++            <Route path="/dashboard/admin" element={<AdminLayout />}>
++              <Route index element={<AdminDashboard />} />
++              <Route path="cv" element={<AdminCV />} />
++              <Route path="jobs" element={<AdminJobs />} />
++              <Route path="invitations" element={<AdminInvitations />} />
++              <Route path="applications" element={<AdminApplications />} />
 +            </Route>
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />

@@ -57,6 +57,24 @@ const Header: React.FC = () => {
     return '/';
   };
 
+  const goToEditProfile = () => {
+    setMenuOpen(false);
+    const role = auth?.currentUser?.role;
+    if (role === Role.STUDENT) {
+      navigate('/dashboard/student/cv');
+      return;
+    }
+    if (role === Role.ADMIN) {
+      navigate('/dashboard/admin/cv');
+      return;
+    }
+    if (role === Role.COMPANY) {
+      navigate('/dashboard/company');
+      return;
+    }
+    navigate('/');
+  };
+
   return (
     <header className="app-header sticky top-0 z-50">
       <div className="w-full px-4 sm:px-6 lg:px-8">
@@ -127,12 +145,12 @@ const Header: React.FC = () => {
                 {menuOpen && (
                   <div role="menu" className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg py-1 z-50">
                     <button
-                      onClick={() => { setMenuOpen(false); navigate('/dashboard/student/cv'); }}
-                      className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
-                      role="menuitem"
-                    >
-                      Editar perfil
-                    </button>
+                      onClick={goToEditProfile}
+                       className="block w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                       role="menuitem"
+                     >
+                       Editar perfil
+                     </button>
                     <button
                       onClick={() => { setMenuOpen(false); handleLogout(); }}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50"

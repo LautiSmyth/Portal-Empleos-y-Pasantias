@@ -9,6 +9,7 @@ import { fetchCompanies, fetchCompaniesByIds } from '../services/companiesServic
 import { fetchApplicationsByStudent } from '../services/applicationsService';
 import { fetchCVByOwnerId } from '../services/cvService';
 import StudentSidebar from '../components/StudentSidebar';
++import AdminSidebar from '../components/AdminSidebar';
 
 const getStatusColor = (status: ApplicationStatus) => {
   switch (status) {
@@ -246,7 +247,8 @@ const JobListings: React.FC = () => {
       {/* Sidebar */}
       <aside className="md:w-1/4 lg:w-1/5">
         <div className="sticky top-24 space-y-4">
-          <StudentSidebar />
+-          {auth?.currentUser?.role === Role.ADMIN ? <AdminSidebar /> : null}
++          {auth?.currentUser?.role === Role.ADMIN ? <AdminSidebar /> : <StudentSidebar />}
           <div className="bg-white p-6 rounded-lg shadow-sm">
             <h3 className="text-lg font-bold mb-4">Filters</h3>
             <div className="space-y-4">
