@@ -160,11 +160,11 @@ const JobListings: React.FC = () => {
 
   if (studentNeedsCVGate) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <aside className="lg:col-span-1 self-start sticky top-24 max-h-[calc(100vh-6rem-3rem)] overflow-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-[0.175fr_0.825fr] gap-8">
+        <aside className="self-start sticky top-24 max-h-[calc(100vh-6rem-3rem)] overflow-auto">
           <StudentSidebar />
         </aside>
-        <div className="lg:col-span-3">
+        <div>
           <h1 className="text-3xl font-bold mb-6">Empleos para ti</h1>
           <div className="bg-white p-8 rounded-lg shadow-sm text-center space-y-4">
             <h2 className="text-2xl font-bold">Completa tu CV para acceder a la bolsa</h2>
@@ -179,11 +179,11 @@ const JobListings: React.FC = () => {
   // Student-focused view: "Empleos para ti"
   if (auth?.currentUser?.role === Role.STUDENT) {
     return (
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        <aside className="lg:col-span-1 self-start sticky top-24 max-h-[calc(100vh-6rem-3rem)] overflow-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-[0.175fr_0.825fr] gap-8">
+        <aside className="self-start sticky top-24 max-h-[calc(100vh-6rem-3rem)] overflow-auto">
           <StudentSidebar />
         </aside>
-        <div className="lg:col-span-3 space-y-8">
+        <div className="space-y-8">
           <h1 className="text-3xl font-bold mb-6">Empleos para ti</h1>
           {/* Tus postulaciones */}
           <section className="bg-white p-6 rounded-lg shadow-sm">
@@ -205,35 +205,31 @@ const JobListings: React.FC = () => {
                   return (
                     <div key={app.id} className="border p-4 rounded-md flex items-center justify-between hover:bg-gray-50 transition-colors">
                       <div>
-                        <Link to={`/jobs/${job.id}`} className="font-bold text-lg brand-link hover:underline">{job.title}</Link>
-                        <p className="text-gray-600">{company.name}</p>
-                        <p className="text-sm text-gray-500 mt-1">Enviada: {app.appliedAt.toLocaleDateString()}</p>
+                        <div className="font-semibold">{job.title}</div>
+                        <div className="text-sm text-gray-600">{company?.name}</div>
                       </div>
-                      <span className={getStatusColor(app.status)}>
-                        {app.status}
-                      </span>
+                      <span className={getStatusColor(app.status)}>{app.status}</span>
                     </div>
                   );
                 })
               ) : (
-                <p className="text-gray-500">Aún no has postulado a empleos.</p>
+                <div className="text-gray-500">Aún no has aplicado a trabajos.</div>
               )}
             </div>
           </section>
 
-          {/* Propuestas para ti */}
+          {/* Recomendados */}
           <section className="bg-white p-6 rounded-lg shadow-sm">
-            <h2 className="text-2xl font-bold mb-4">Propuestas para ti</h2>
-            {recommendedJobs.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {recommendedJobs.map((job) => (
-                  <JobCard key={job.id} job={job} company={companyMap[job.companyId]} />
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-6">
-                <p className="text-gray-500">Sin propuestas por ahora. Completa tu CV para mejores recomendaciones.</p>
-              </div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">Recomendados</h2>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {recommendedJobs.map((job) => (
+                <JobCard key={job.id} job={job} company={companyMap[job.companyId]} />
+              ))}
+            </div>
+            {recommendedJobs.length === 0 && (
+              <div className="text-gray-500">Sin propuestas por ahora. Completa tu CV para mejores recomendaciones.</div>
             )}
           </section>
         </div>
@@ -243,94 +239,94 @@ const JobListings: React.FC = () => {
 
   // Fallback: listado original de empleos para otros roles
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[0.175fr_0.825fr] gap-8">
       {/* Sidebar */}
-      <aside className="lg:col-span-1 sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
-      <div className="space-y-4">
-           {auth?.currentUser?.role === Role.ADMIN ? <AdminSidebar /> : <StudentSidebar />}
-           <div className="bg-white p-6 rounded-lg shadow-sm">
-             <h3 className="text-lg font-bold mb-4">Filters</h3>
-             <div className="space-y-4">
-               <div>
-                 <label htmlFor="search" className="block text-sm font-medium text-gray-700">Keywords</label>
-                 <input
-                   type="text"
-                   id="search"
-                   value={query}
-                   onChange={(e) => setQuery(e.target.value)}
-                   placeholder="Job title, company..."
-                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                 />
-               </div>
-               <div>
-                 <label htmlFor="area" className="block text-sm font-medium text-gray-700">Area</label>
-                 <select
-                   id="area"
-                   value={area}
-                   onChange={(e) => setArea(e.target.value)}
-                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                 >
-                   <option value="">All Areas</option>
-                   {uniqueAreas.map(a => <option key={a} value={a}>{a}</option>)}
-                 </select>
-               </div>
-               <div>
-                 <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
-                 <select
-                   id="location"
-                   value={location}
-                   onChange={(e) => setLocation(e.target.value)}
-                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                 >
-                   <option value="">All Locations</option>
-                   {uniqueLocations.map(l => <option key={l} value={l}>{l}</option>)}
-                 </select>
-               </div>
-               <div>
-                 <label htmlFor="modality" className="block text sm font-medium text-gray-700">Modality</label>
-                 <select
-                   id="modality"
-                   value={modality}
-                   onChange={(e) => setModality(e.target.value)}
-                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                 >
-                   <option value="">All Modalities</option>
-                   {uniqueModalities.map(m => <option key={m} value={m}>{m}</option>)}
-                 </select>
-               </div>
-               <div>
-                 <label htmlFor="level" className="block text-sm font-medium text-gray-700">Experience Level</label>
-                 <select
-                   id="level"
-                   value={level}
-                   onChange={(e) => setLevel(e.target.value as any)}
-                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                 >
-                   <option value="">Any level</option>
-                   <option value={ExperienceLevel.JUNIOR}>Junior</option>
-                   <option value={ExperienceLevel.SEMISENIOR}>Semi-senior</option>
-                   <option value={ExperienceLevel.SENIOR}>Senior</option>
-                 </select>
-               </div>
-               <div>
-                 <label htmlFor="experience" className="block text-sm font-medium text-gray-700">Minimum Experience</label>
-                 <input
-                   type="range"
-                   id="experience"
-                   min="0"
-                   max="10"
-                   value={minExperience}
-                   onChange={(e) => setMinExperience(parseInt(e.target.value))}
-                   className="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                 />
-                 <div className="text-right text-sm text-gray-600">{minExperience}+ years</div>
-               </div>
-             </div>
-           </div>
-         </div>
-       </aside>
-       {/* Job Listings */}
-      <div className="lg:col-span-3">
+      <aside className="sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
+        <div className="space-y-4">
+          {auth?.currentUser?.role === Role.ADMIN ? <AdminSidebar /> : <StudentSidebar />}
+          <div className="bg-white p-6 rounded-lg shadow-sm">
+            <h3 className="text-lg font-bold mb-4">Filters</h3>
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="search" className="block text-sm font-medium text-gray-700">Keywords</label>
+                <input
+                  type="text"
+                  id="search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Job title, company..."
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                />
+              </div>
+              <div>
+                <label htmlFor="area" className="block text-sm font-medium text-gray-700">Area</label>
+                <select
+                  id="area"
+                  value={area}
+                  onChange={(e) => setArea(e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  <option value="">All Areas</option>
+                  {uniqueAreas.map(a => <option key={a} value={a}>{a}</option>)}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
+                <select
+                  id="location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  <option value="">All Locations</option>
+                  {uniqueLocations.map(l => <option key={l} value={l}>{l}</option>)}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="modality" className="block text sm font-medium text-gray-700">Modality</label>
+                <select
+                  id="modality"
+                  value={modality}
+                  onChange={(e) => setModality(e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  <option value="">All Modalities</option>
+                  {uniqueModalities.map(m => <option key={m} value={m}>{m}</option>)}
+                </select>
+              </div>
+              <div>
+                <label htmlFor="level" className="block text-sm font-medium text-gray-700">Experience Level</label>
+                <select
+                  id="level"
+                  value={level}
+                  onChange={(e) => setLevel(e.target.value as any)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                >
+                  <option value="">Any level</option>
+                  <option value={ExperienceLevel.JUNIOR}>Junior</option>
+                  <option value={ExperienceLevel.SEMISENIOR}>Semi-senior</option>
+                  <option value={ExperienceLevel.SENIOR}>Senior</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="experience" className="block text-sm font-medium text-gray-700">Minimum Experience</label>
+                <input
+                  type="range"
+                  id="experience"
+                  min="0"
+                  max="10"
+                  value={minExperience}
+                  onChange={(e) => setMinExperience(parseInt(e.target.value))}
+                  className="mt-1 w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                />
+                <div className="text-right text-sm text-gray-600">{minExperience}+ years</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+      {/* Job Listings */}
+      <div>
         <h2 className="text-2xl font-bold mb-4">
           {filteredJobs.length} Job Openings
         </h2>

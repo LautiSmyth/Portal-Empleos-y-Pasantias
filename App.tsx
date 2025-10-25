@@ -336,31 +336,19 @@ const App: React.FC = () => {
             <Route path="/" element={<Home />} />
             <Route path="/jobs" element={<JobListings />} />
             <Route path="/jobs/:jobId" element={<JobDetail />} />
--            <Route element={<StudentLayout />}> 
--              <Route path="/dashboard/student" element={<StudentDashboard />} />
--              <Route path="/dashboard/student/cv" element={<StudentCV />} />
--              <Route path="/dashboard/student/invitations" element={<StudentInvitations />} />
--            </Route>
-+            <Route path="/dashboard/student" element={<StudentLayout />}>
-+              <Route index element={<StudentDashboard />} />
-+              <Route path="cv" element={<StudentCV />} />
-+              <Route path="invitations" element={<StudentInvitations />} />
-+            </Route>
+            <Route path="/dashboard/student" element={<StudentLayout />}>
+              <Route index element={<StudentDashboard />} />
+              <Route path="cv" element={<StudentCV />} />
+              <Route path="invitations" element={<StudentInvitations />} />
+            </Route>
             <Route path="/dashboard/company" element={<CompanyDashboard />} />
--            <Route element={<AdminLayout />}> 
--              <Route path="/dashboard/admin" element={<AdminDashboard />} />
--              <Route path="/dashboard/admin/cv" element={<AdminCV />} />
--              <Route path="/dashboard/admin/jobs" element={<AdminJobs />} />
--              <Route path="/dashboard/admin/invitations" element={<AdminInvitations />} />
--              <Route path="/dashboard/admin/applications" element={<AdminApplications />} />
--            </Route>
-+            <Route path="/dashboard/admin" element={<AdminLayout />}>
-+              <Route index element={<AdminDashboard />} />
-+              <Route path="cv" element={<AdminCV />} />
-+              <Route path="jobs" element={<AdminJobs />} />
-+              <Route path="invitations" element={<AdminInvitations />} />
-+              <Route path="applications" element={<AdminApplications />} />
-+            </Route>
+            <Route path="/dashboard/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="cv" element={<AdminCV />} />
+              <Route path="jobs" element={<AdminJobs />} />
+              <Route path="invitations" element={<AdminInvitations />} />
+              <Route path="applications" element={<AdminApplications />} />
+            </Route>
             <Route path="/auth/login" element={<Login />} />
             <Route path="/auth/register" element={<Register />} />
             <Route path="/auth/verify-email" element={<VerifyEmail />} />
@@ -383,15 +371,15 @@ const StudentLayout: React.FC = () => {
   const auth = useContext(AuthContext);
   const isStudent = auth?.currentUser?.role === Role.STUDENT;
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[0.175fr_0.825fr] gap-8">
       {isStudent ? (
-        <aside className="lg:col-span-1 sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
+        <aside className="sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
           <StudentSidebar />
         </aside>
       ) : (
-        <aside className="lg:col-span-1" />
+        <aside className="hidden lg:block" />
       )}
-      <div className="lg:col-span-3">
+      <div>
         <Outlet />
       </div>
     </div>
@@ -402,15 +390,15 @@ const AdminLayout: React.FC = () => {
   const auth = useContext(AuthContext);
   const isAdmin = auth?.currentUser?.role === Role.ADMIN;
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[0.175fr_0.825fr] gap-8">
       {isAdmin ? (
-        <aside className="lg:col-span-1 sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
+        <aside className="sticky top-24 h-[calc(100vh-6rem)] overflow-auto">
           <AdminSidebar />
         </aside>
       ) : (
-        <aside className="lg:col-span-1" />
+        <aside className="hidden lg:block" />
       )}
-      <div className="lg:col-span-3">
+      <div>
         <Outlet />
       </div>
     </div>
