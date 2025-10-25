@@ -15,26 +15,6 @@ body {
 
 :root {
   color-scheme: light;
-  /* Palette */
-  --color-primary: #2563eb; /* blue-600 */
-  --color-primary-hover: #1d4ed8; /* blue-700 */
-  --color-bg: #f8fafc; /* slate-50 */
-  --color-card: #ffffff;
-  --color-border: #e5e7eb; /* gray-200 */
-  --color-text: #111827; /* gray-900 */
-  --color-muted: #6b7280; /* gray-500 */
-  --radius: 10px;
-  /* Spacing */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-}
-
-/* Dark scheme hint */
-:root[data-theme="dark"] {
-  color-scheme: dark;
 }
 
 /* Smooth theme transition */
@@ -77,13 +57,14 @@ html, body, * {
 
 /* Buttons focus ring in dark */
 :root[data-theme="dark"] .btn:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
 /* Design utilities */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   padding: 8px 12px;
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   font-size: 0.875rem;
   font-weight: 600;
   text-decoration: none;
@@ -97,10 +78,10 @@ html, body, * {
 .btn-primary:hover { background: var(--color-primary-hover); }
 
 .card {
-  background: var(--color-card);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
   padding: var(--space-6);
   margin-bottom: var(--space-4);
 }
