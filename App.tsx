@@ -13,16 +13,14 @@ import { Role } from './types';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyEmail from './pages/VerifyEmail';
-import StudentCV from './pages/StudentCV';
+import CV from './pages/CV';
 import { supabase } from './services/supabaseClient';
 import { SpeedInsights } from '@vercel/speed-insights/react';
-import AdminCV from './pages/AdminCV';
 import AdminJobs from './pages/AdminJobs';
 import DesignSystem from './pages/DesignSystem';
 import StudentSidebar from './components/StudentSidebar';
-import StudentInvitations from './pages/StudentInvitations';
+import Invitations from './pages/Invitations';
 import AdminSidebar from './components/AdminSidebar';
-import AdminInvitations from './pages/AdminInvitations';
 import AdminApplications from './pages/AdminApplications';
 
 export type AuthUser = {
@@ -338,15 +336,15 @@ const App: React.FC = () => {
             <Route path="/jobs/:jobId" element={<JobDetail />} />
             <Route path="/dashboard/student" element={<StudentLayout />}>
               <Route index element={<StudentDashboard />} />
-              <Route path="cv" element={<StudentCV />} />
-              <Route path="invitations" element={<StudentInvitations />} />
+              <Route path="cv" element={<CV />} />
+              <Route path="invitations" element={<Invitations />} />
             </Route>
             <Route path="/dashboard/company" element={<CompanyDashboard />} />
             <Route path="/dashboard/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
-              <Route path="cv" element={<AdminCV />} />
+              <Route path="cv" element={<CV />} />
               <Route path="jobs" element={<AdminJobs />} />
-              <Route path="invitations" element={<AdminInvitations />} />
+              <Route path="invitations" element={<Invitations />} />
               <Route path="applications" element={<AdminApplications />} />
             </Route>
             <Route path="/auth/login" element={<Login />} />
