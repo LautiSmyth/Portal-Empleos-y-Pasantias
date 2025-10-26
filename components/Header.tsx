@@ -83,7 +83,7 @@ const Header: React.FC = () => {
           <div className="flex items-center gap-4 flex-1">
             <div className="flex-shrink-0 flex items-center gap-2">
               <Link to="/" className="flex items-center gap-2 brand-link">
-                <img src="/logo.svg" alt="Logo" className="h-8 w-8" />
+                <img src="/logo.png" alt="Logo" className="h-8 w-8" />
                 <span className="text-2xl font-bold">Portal Empleos y Pasantías</span>
               </Link>
             </div>
